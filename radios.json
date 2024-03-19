@@ -1,0 +1,62 @@
+[
+    {
+        "key": 1,
+        "name": "AM 750",
+        "url": "https://us-b5-p-e-kj2-audio.cdn.mdstrm.com/live-audio-aw-bkp/6237761f64b72676f05cf6ab"
+    },
+    {
+        "key": 2,
+        "name": "Rivadavia",
+        "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RIVADAVIAAAC.aac"
+    },
+    {
+        "key": 3,
+        "name": "Rock & Pop",
+        "url": " https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKANDPOPAAC.aac"
+    },
+    {
+        "key": 4,
+        "name": "Radio Uno",
+        "url": " https://playerservices.streamtheworld.com/api/livestream-redirect/UNOAAC.aac"
+    },
+    {
+        "key": 5,
+        "name": "La Red",
+        "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/LA_RED_AM910AAC.aac"
+    },
+    {
+        "key": 6,
+        "name": "Continental",
+        "url": "https://20833.live.streamtheworld.com/CONTINENTALAAC.aac"
+    },
+    {
+        "key": 7,
+        "name": "La 100",
+        "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/FM999_56.mp3"
+    },
+    {
+        "key": 8,
+        "name": "El Destape",
+        "url": "https://ipanel.instream.audio/8004/stream"
+    },
+    {
+        "key": 9,
+        "name": "Radio Mitre",
+        "url": "http://buecrplb01.cienradios.com.ar/Mitre790.aac"
+    },
+    {
+        "key": 10,
+        "name": "La 990",
+        "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/AM990AAC.aac"
+    },
+    {
+        "key": 11,
+        "name": "Aspen",
+        "url": "https://mdstrm.com/audio/60a2745ff943100826374a70/icecast.audio"
+    },
+    {
+        "key": 12,
+        "name": "Cultura",
+        "url": "https://usa5.fastcast4u.com/proxy/radiocultura?mp=/1"
+    }
+]
