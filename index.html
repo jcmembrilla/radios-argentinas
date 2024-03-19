@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./Images/mic.png" type="image/png" />
+    <link rel="stylesheet" href="./style.css">
+    <title>Radios Argentinas</title>
+</head>
+
+<body class="bg">
+    <div class="col-12 position-relative centerBotton">
+        <h1>Radios Argentinas</h1>
+        <span id="play-pause-button">
+            <img id="play-pause-icon" alt="Play/Pause" width="140" height="140" src="./Images/play.png" class="boton" />
+        </span>
+        <div class="mt-3">
+            <input type="range" min="0" max="1" id="volume-slider" step="0.01" />
+        </div>
+        <div class="mt-3">
+            <select id="radio-selector" class="select-container btn btn-success">
+                <option value="">Elije tu radio</option>
+            </select>
+        </div>
+    </div>
+
+    <footer>
+        <div>
+            <h3>Siempre a tu alcance</h3>
+            <p>Una aplicación pensada para ser practica y sencilla</p>
+        </div>
+        <div>
+            <span id="fecha-actual"></span>
+        </div>
+    </footer>
+
+
+    <script type="module" src="index.js"></script>
+</body>
+
+</html>
