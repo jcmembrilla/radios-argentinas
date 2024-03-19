@@ -1,6 +1,6 @@
 //Import iconos play y pause
-import playButoon from './Images/play.png';
-import pasueButoon from './Images/pause.png';
+import playButoon from './assets/images/play.png';
+import pauseButoon from './assets/images/pause.png';
 
 
 const audioElement = document.createElement('audio');
@@ -11,7 +11,7 @@ const radioSelector = document.getElementById('radio-selector');
 
 // Función para cargar el archivo JSON y poblar el selector
 async function loadRadios() {
-    const response = await fetch('radios.json');
+    const response = await fetch('/radios.json');
     const data = await response.json();
 
     for (const radio of data) {
@@ -36,7 +36,7 @@ playPauseButton.addEventListener('click', () => {
         if (selectedUrl) {
             audioElement.src = selectedUrl;
             audioElement.play();
-            playPauseIcon.src = pasueButoon; // Actualizar la imagen para el estado de reproducción
+            playPauseIcon.src = pauseButoon; // Actualizar la imagen para el estado de reproducción
         }
     }
     isPlaying = !isPlaying;

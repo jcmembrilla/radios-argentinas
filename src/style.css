@@ -23,7 +23,7 @@ body {
 .bg {
   background-image: linear-gradient(to right,
       rgba(0, 0, 0, 0.8),
-      rgba(0, 0, 0, 0.8)), url("./Images/argBandera2.jpg");
+      rgba(0, 0, 0, 0.8)), url("./assets/images/argBandera.jpg");
   background-size: cover;
   position: fixed;
   top: 0;
