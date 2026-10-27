@@ -5,14 +5,13 @@
  * ============================================================
  *
  *  Renderiza en build time (HTML estático): head con SEO/OG, favicon,
- *  manifest PWA, fondo de la app y footer con el almanaque.
+ *  manifest PWA, fondo de la app y atribución de autoría.
  *  Todo lo interactivo se hidrata dentro de <slot /> (islas React).
  *
  *  Estilos: Tailwind v4 (global.css provee tokens y utilidades custom;
  *  el resto son utilidades aplicadas directo en el markup).
  */
 import '../styles/global.css';
-import Almanac from '../components/Almanac.jsx';
 
 interface Props {
   title?: string;
@@ -57,17 +56,18 @@ const {
     <title>{title}</title>
   </head>
 
-  <!-- bg-app: utilidad custom (base azul-negra + glow radial celeste).
-       El body es columna flex: main crece (flex-1) y el footer queda abajo. -->
+  <!-- bg-app: utilidad custom (base azul-negra + glow radial celeste). -->
   <body class="bg-app flex min-h-svh flex-col font-sans antialiased text-fg">
     <slot />
 
-    <footer class="flex flex-col items-center gap-2 px-4 pt-6 pb-8 text-center">
-      <!-- Almanaque: fecha + clima automático (por IP, sin prompts).
-           client:idle: se hidrata cuando el navegador está libre,
-           después del player que es lo crítico. -->
-      <Almanac client:idle />
-      <p class="text-[0.8rem] text-white/40">Siempre a tu alcance</p>
+    <footer class="flex items-center justify-center gap-2 px-4 pt-4 pb-6 text-center">
+      <img
+        src="/Hornero-Arq.svg"
+        alt=""
+        aria-hidden="true"
+        class="h-7 w-auto"
+      />
+      <small class="text-[0.7rem] text-white/40">© Hornero-Arq</small>
     </footer>
   </body>
 </html>

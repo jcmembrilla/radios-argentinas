@@ -14,6 +14,7 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Player from '../components/Player.jsx';
+import Almanac from '../components/Almanac.jsx';
 import radios from '../data/radios.json';
 ---
 
@@ -47,6 +48,12 @@ import radios from '../data/radios.json';
         <span class="h-px w-10 bg-celeste/50"></span>
       </div>
     </div>
+
+    <!-- Almanaque: fecha + clima automático (por IP, sin prompts).
+         client:idle: se hidrata cuando el navegador está libre,
+         después del player que es lo crítico. -->
+    <Almanac client:idle />
+    <p class="text-[0.8rem] text-white/40">Siempre a tu alcance</p>
 
     <Player client:load radios={radios} />
   </main>
