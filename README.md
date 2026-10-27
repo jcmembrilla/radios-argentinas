@@ -17,6 +17,7 @@ La aplicación está disponible en producción: **[radiosarg.netlify.app](https:
 - 🎙️ **Streaming en vivo** de las principales radios AM y FM de Argentina (AM 750, Rivadavia, La Red, Radio Mitre, Aspen y más).
 - ▶️ **Reproductor confiable**: máquina de estados basada en eventos reales del audio, con spinner de conexión y avisos de error si una radio cae.
 - 📱 **PWA instalable**: agregala a la pantalla de inicio de tu celular y controlá la reproducción desde la pantalla de bloque (Media Session API).
+- 🌤️ **Almanaque**: fecha del día y clima actual (temperatura + condición) según tu ubicación, detectado automáticamente sin pedir permisos.
 - 💾 **Preferencias recordadas**: guarda tu radio y tu volumen para la próxima visita.
 - 📡 **Catálogo desacoplado**: la lista de radios vive en un JSON editable, sin tocar el código.
 - ⚡ **Rápida**: HTML estático renderizado con Astro; solo el reproductor se hidrata como isla de React.
@@ -29,6 +30,7 @@ La aplicación está disponible en producción: **[radiosarg.netlify.app](https:
 | [React 19](https://react.dev/) | Isla del reproductor (única parte interactiva) |
 | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) | Service worker + manifest (app instalable) |
 | [Tailwind CSS 4](https://tailwindcss.com/) | Estilos: utilidades en el markup + tokens en `@theme` |
+| [Open-Meteo](https://open-meteo.com/) + [ipwho.is](https://ipwho.is/) | Almanaque: clima actual + ubicación aproximada por IP, ambos gratis y sin API key |
 | [Netlify](https://www.netlify.com/) | Hosting y deploy automático |
 
 ## 🚀 Instalación
@@ -69,12 +71,15 @@ radios-argentinas/
 │   │   └── radios.json      # Catálogo de radios (se importa en build time)
 │   ├── hooks/
 │   │   ├── useAudio.js      # Máquina de estados del reproductor
-│   │   └── useMediaSession.js  # Controles de pantalla de bloque
-│   ├── components/          # Isla de React: Player y sub-componentes
-│   │   ├── Player.jsx
+│   │   ├── useMediaSession.js  # Controles de pantalla de bloque
+│   │   └── useAlmanac.js    # Fecha + clima automático (IP → Open-Meteo)
+│   ├── components/          # Islas de React
+│   │   ├── Player.jsx       # Reproductor (client:load)
 │   │   ├── PlayButton.jsx
 │   │   ├── VolumeSlider.jsx
-│   │   └── RadioSelector.jsx
+│   │   ├── RadioSelector.jsx
+│   │   ├── Almanac.jsx      # Pill de fecha/clima (client:idle)
+│   │   └── WeatherIcon.jsx  # SVGs del clima (WMO → icono)
 │   ├── layouts/
 │   │   └── BaseLayout.astro # Head (SEO, OG, PWA), footer y fecha
 │   ├── pages/
