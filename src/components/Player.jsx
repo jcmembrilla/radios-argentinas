@@ -13,7 +13,7 @@
  *  Persistencia: guarda radio elegida y volumen en localStorage y los
  *  restaura en la próxima visita.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import PlayButton from './PlayButton.jsx';
 import VolumeSlider from './VolumeSlider.jsx';
 import RadioSelector from './RadioSelector.jsx';
@@ -54,34 +54,11 @@ function statusContent(state, radioName) {
 }
 
 export default function Player({ radios }) {
-  const { state, play, pause, toggle, volume, setVolume } = useAudio();
+  const { state, play, pause, select, toggle, volume, setVolume } = useAudio();
 
   // Radio elegida: '' = ninguna. Se setea post-hidratación desde
   // localStorage para evitar mismatches de hidratación con el SSR de Astro.
   const [selectedUrl, setSelectedUrl] = useState('');
-
-  // Espejo del estado en un ref: permite que el efecto de cambio de radio
-  // lea el estado actual SIN re-dispararse cuando el estado cambia
-  // (solo debe reaccionar a cambios de selección).
-  const stateRef = useRef(state);
-  useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
-
-  // --- Cambio de radio: como una radio de verdad -------------------------
-  // Si estaba sonando (o conectando) y se elige otra emisora, la nueva
-  // arranca automáticamente: girar la perilla no pausa, cambia de radio.
-  // La restauración desde localStorage al montar NO dispara reproducción
-  // (el estado inicial es idle).
-  useEffect(() => {
-    if (
-      selectedUrl &&
-      (stateRef.current === PLAYER_STATE.PLAYING ||
-        stateRef.current === PLAYER_STATE.LOADING)
-    ) {
-      play(selectedUrl);
-    }
-  }, [selectedUrl, play]);
 
   // --- Restauración de preferencias (una vez, al montar) -----------------
   useEffect(() => {
@@ -122,6 +99,19 @@ export default function Player({ radios }) {
     toggle(selectedUrl);
   }, [toggle, selectedUrl]);
 
+  /**
+   * El selector es quien maneja el cambio de emisora:
+   * actualiza la selección y le pasa la decisión a useAudio (select),
+   * que reproduce la nueva si la radio estaba prendida.
+   */
+  const handleSelect = useCallback(
+    (url) => {
+      setSelectedUrl(url);
+      select(url);
+    },
+    [select],
+  );
+
   const handlePlay = useCallback(() => {
     if (selectedUrl) play(selectedUrl);
   }, [play, selectedUrl]);
@@ -148,7 +138,7 @@ export default function Player({ radios }) {
       <RadioSelector
         radios={radios}
         selectedUrl={selectedUrl}
-        onChange={setSelectedUrl}
+        onChange={handleSelect}
       />
 
       {/* Estado para lectores de pantalla y feedback visual */}

@@ -39,6 +39,13 @@ export const PLAYER_STATE = {
 export function useAudio() {
   /** Referencia estable al elemento <audio> (se crea una sola vez). */
   const audioRef = useRef(null);
+  /**
+   * Intención del usuario: la radio "prendida" (true) o "apagada" (false).
+   * Está separada del estado real del audio a propósito: girar el dial
+   * (select) no cambia la intención — si estaba prendida, sigue prendida
+   * con la nueva emisora. Es el modelo de una radio de verdad.
+   */
+  const wantPlayingRef = useRef(false);
   const [state, setState] = useState(PLAYER_STATE.IDLE);
   const [volume, setVolumeState] = useState(1);
 
@@ -73,15 +80,17 @@ export function useAudio() {
   }, []);
 
   /**
-   * Reproduce la radio en `url`.
+   * Reproduce la radio en `url` y marca la intención como prendida.
    * Si el navegador bloquea el autoplay o el stream no responde, el estado
-   * queda en `error` para que la UI lo refleje.
+   * queda en `error` para que la UI lo refleje (la intención sigue ON:
+   * si el usuario cambia de radio, se reintenta solo).
    * @param {string} url - URL del stream (debe venir trimmeada).
    */
   const play = useCallback(async (url) => {
     const audio = audioRef.current;
     if (!audio || !url) return;
 
+    wantPlayingRef.current = true;
     if (audio.src !== url) audio.src = url;
     setState(PLAYER_STATE.LOADING);
     try {
@@ -92,13 +101,34 @@ export function useAudio() {
     }
   }, []);
 
-  /** Pausa el stream y refleja el estado en la UI. */
+  /** Pausa el stream, marca la intención como apagada y refleja el estado. */
   const pause = useCallback(() => {
+    wantPlayingRef.current = false;
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
     setState(PLAYER_STATE.PAUSED);
   }, []);
+
+  /**
+   * Cambio de emisora (girar el dial del selector).
+   * - Radio prendida  → reproduce la nueva automáticamente (cambia, no pausa).
+   * - Radio apagada   → queda seleccionada para el próximo play.
+   * - Vuelta al placeholder ('') → corta.
+   * @param {string} url - URL de la emisora elegida ('' = ninguna).
+   */
+  const select = useCallback(
+    (url) => {
+      if (!url) {
+        pause();
+        return;
+      }
+      if (wantPlayingRef.current) {
+        play(url);
+      }
+    },
+    [play, pause],
+  );
 
   /** Alterna entre reproducir y pausar para la radio en `url`. */
   const toggle = useCallback(
@@ -119,5 +149,5 @@ export function useAudio() {
     if (audioRef.current) audioRef.current.volume = clamped;
   }, []);
 
-  return { state, play, pause, toggle, volume, setVolume };
+  return { state, play, pause, select, toggle, volume, setVolume };
 }
