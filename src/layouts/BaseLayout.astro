@@ -7,7 +7,12 @@
  *  Renderiza en build time (HTML estático): head con SEO/OG, favicon,
  *  manifest PWA, fondo de la app, footer y el script de la fecha.
  *  Todo lo interactivo se hidrata dentro de <slot /> (islas React).
+ *
+ *  Estilos: Tailwind v4 (global.css provee tokens y utilidades custom;
+ *  el resto son utilidades aplicadas directo en el markup).
  */
+import '../styles/global.css';
+
 interface Props {
   title?: string;
   description?: string;
@@ -51,16 +56,20 @@ const {
     <title>{title}</title>
   </head>
 
-  <body class="bg">
+  <!-- bg-flag: utilidad custom (bandera + overlay).
+       El body es columna flex: main crece (flex-1) y el footer queda abajo. -->
+  <body class="bg-flag flex min-h-svh flex-col font-sans antialiased text-fg">
     <slot />
 
-    <footer>
-      <div class="footer__slogan">
-        <h3>Siempre a tu alcance</h3>
-        <p>Una aplicación pensada para ser práctica y sencilla</p>
+    <footer class="flex flex-col items-center gap-1 px-4 pt-6 pb-8 text-center">
+      <div>
+        <h3 class="mb-1 text-[1.1rem]">Siempre a tu alcance</h3>
+        <p class="text-[0.9rem] text-white/70">
+          Una aplicación pensada para ser práctica y sencilla
+        </p>
       </div>
       <!-- La completa el script de abajo con la fecha del día -->
-      <span id="fecha-actual" class="footer__fecha"></span>
+      <span id="fecha-actual" class="mt-2 text-[0.85rem] text-white/70"></span>
     </footer>
 
     <!-- Fecha actual (d/m/aaaa): se calcula en el navegador para no quedar

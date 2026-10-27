@@ -7,8 +7,13 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import pwa from '@vite-pwa/astro';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+  // Tailwind v4 se integra como plugin de Vite (sin integración de Astro)
+  vite: {
+    plugins: [tailwindcss()],
+  },
   integrations: [
     react(),
     pwa({

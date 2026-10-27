@@ -53,6 +53,8 @@ Radios Argentinas es una **aplicación web estática de una sola página** para 
 | Workbox (vía `@vite-pwa/astro`) en modo `generateSW` | Service worker escrito a mano | Configuración declarativa, precache automático del app shell con hash de versiones. |
 | Netlify | Vercel, GitHub Pages | Deploy automático desde `main`, dominio propio, SSL y CDN global sin costo. |
 | Vite (directo) | — | Reemplazado por Astro 5, que internamente usa Vite y además resuelve el render estático y las islas. |
+| Tailwind v4 (`@tailwindcss/vite`) | CSS plano con clases BEM | Estilos co-localizados en cada componente, tokens centralizados en `@theme`, CSS final tree-shakeado (12.6 KB con todo el sitio). La integración `@astrojs/tailwind` está deprecada: v4 se integra como plugin de Vite. |
+| Capa custom mínima en `global.css` | Todo en utilidades | Solo lo no expresable: fondo con imagen + overlay (`bg-flag`), flecha del select (`select-arrow`) y pseudo-elementos del slider (`.range-field`). |
 
 ## 📂 Estructura del proyecto
 
@@ -73,8 +75,8 @@ radios-argentinas/
 │   │   └── RadioSelector.jsx# <select> de emisoras
 │   ├── layouts/BaseLayout.astro  # <head> (SEO/OG/PWA), footer, fecha
 │   ├── pages/index.astro    # Página única, HTML estático
-│   └── styles/global.css    # Variables, fondo, reproductor, footer
-├── astro.config.mjs         # Integraciones: react + PWA (manifest, SW)
+│   └── styles/global.css    # Tokens @theme, utilidades custom, foco global
+├── astro.config.mjs         # Integraciones: react, PWA (manifest, SW), Tailwind
 ├── netlify.toml             # command + publish para Netlify
 ├── ARCHITECTURE.md          # Este documento
 └── package.json
@@ -90,7 +92,8 @@ radios-argentinas/
 | `src/hooks/useAudio.js` | Ciclo de vida del `<audio>` y estados `idle/loading/playing/paused/error` derivados de eventos reales. |
 | `src/hooks/useMediaSession.js` | Metadatos y handlers play/pause para la pantalla de bloque y auriculares. |
 | `src/data/radios.json` | Catálogo de emisoras: `key`, `name`, `url`. |
-| `astro.config.mjs` | Integración React y configuración completa de la PWA (manifest + workbox). |
+| `src/styles/global.css` | Tokens Tailwind (`@theme`), foco de teclado global y utilidades custom (`bg-flag`, `select-arrow`, thumb del slider). |
+| `astro.config.mjs` | Integraciones React/PWA y plugin de Vite de Tailwind. |
 
 ## 🔄 Flujo de datos
 
@@ -185,4 +188,5 @@ flowchart LR
 |---|---|---|
 | v1 | HTML + CSS + JS vanilla, Vite, Netlify | App funcional básica. Bugs de estado en el player, sin SEO, deploy mal configurado. |
 | v1.5 | v1 + fixes | Estado del player corregido, meta tags, `netlify.toml` arreglado, JSDoc completo. Ver commit `fix:` en el historial. |
-| **v2 (actual)** | **Astro 5 + isla de React + PWA** | Render estático con SEO, máquina de estados por eventos, catálogo en build time, PWA instalable con Media Session, assets optimizados (SVG, WebP, -67% de peso del fondo). |
+| v2 (actual) | Astro 5 + isla de React + PWA | Render estático con SEO, máquina de estados por eventos, catálogo en build time, PWA instalable con Media Session, assets optimizados (SVG, WebP, -67% de peso del fondo). |
+| v2.1 | + Tailwind v4 | Migración completa de estilos a utilidades: tokens en `@theme`, capa custom reducida a lo no expresable (fondo, flecha del select, thumb del slider). CSS final tree-shakeado: 12.6 KB. |
