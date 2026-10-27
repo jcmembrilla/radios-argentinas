@@ -18,8 +18,13 @@ import radios from '../data/radios.json';
 ---
 
 <BaseLayout>
-  <main class="player">
-    <h1 class="player__title">Radios Argentinas</h1>
+  <!-- flex-1: ocupa el alto restante del body y centra el reproductor -->
+  <main
+    class="flex flex-1 flex-col items-center justify-center gap-10 px-4 py-10 text-center"
+  >
+    <h1 class="text-[clamp(1.75rem,5vw,2.75rem)] tracking-[0.02em]">
+      Radios Argentinas
+    </h1>
     <Player client:load radios={radios} />
   </main>
 </BaseLayout>

@@ -5,8 +5,8 @@
 ![Netlify](https://img.shields.io/badge/deploy-Netlify-00C7B7?logo=netlify&logoColor=white)
 ![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro&logoColor=white)
 ![React](https://img.shields.io/badge/React-19.x-61DAFB?logo=react&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?logo=tailwindcss&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-instalable-5A0FC8?logo=pwa&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TS%20config-3178C6?logo=typescript&logoColor=white)
 
 ## 🌐 Demo
 
@@ -28,7 +28,7 @@ La aplicación está disponible en producción: **[radiosarg.netlify.app](https:
 | [Astro 5](https://astro.build/) | Framework del sitio: HTML estático en build time |
 | [React 19](https://react.dev/) | Isla del reproductor (única parte interactiva) |
 | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) | Service worker + manifest (app instalable) |
-| CSS | Estilos, sin preprocesadores ni frameworks de UI |
+| [Tailwind CSS 4](https://tailwindcss.com/) | Estilos: utilidades en el markup + tokens en `@theme` |
 | [Netlify](https://www.netlify.com/) | Hosting y deploy automático |
 
 ## 🚀 Instalación
@@ -80,7 +80,7 @@ radios-argentinas/
 │   ├── pages/
 │   │   └── index.astro      # Página principal (estática)
 │   └── styles/
-│       └── global.css       # Estilos globales
+│       └── global.css       # Tailwind v4: tokens (@theme) + utilidades custom
 ├── astro.config.mjs         # Configuración de Astro + integraciones
 ├── netlify.toml             # Configuración de build para Netlify
 ├── ARCHITECTURE.md          # Documentación de arquitectura

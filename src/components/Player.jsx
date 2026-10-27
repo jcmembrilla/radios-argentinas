@@ -100,7 +100,7 @@ export default function Player({ radios }) {
   });
 
   return (
-    <div className="player-controls">
+    <div className="flex flex-col items-center gap-5">
       {/* Botón play/pause: deshabilitado hasta elegir una radio */}
       <PlayButton
         state={state}
@@ -117,7 +117,7 @@ export default function Player({ radios }) {
       />
 
       {/* Estado para lectores de pantalla y feedback visual */}
-      <p className="player-status" role="status" aria-live="polite">
+      <p className="min-h-6 text-[0.95rem] text-white/70" role="status" aria-live="polite">
         {statusMessage(state, selectedRadio?.name ?? '')}
       </p>
     </div>
