@@ -13,7 +13,7 @@ export default function RadioSelector({ radios, selectedUrl, onChange }) {
     <label>
       <span className="sr-only">Elegí una radio</span>
       <select
-        className="select-field select-arrow h-10 w-55 max-w-[80vw] cursor-pointer rounded-xl border border-white/10 bg-white/5 py-1 pl-10 pr-9 text-base font-bold text-fg backdrop-blur-sm hover:border-white/25 focus:border-celeste focus:outline-none max-[480px]:w-44"
+        className="select-field select-arrow appearance-none h-10 w-55 max-w-[80vw] cursor-pointer rounded-xl border border-white/10 bg-white/5 py-1 pl-10 pr-9 text-base font-bold text-fg backdrop-blur-sm hover:border-white/25 focus:border-celeste focus:outline-none max-[480px]:w-44"
         value={selectedUrl}
         onChange={(event) => onChange(event.target.value)}
         aria-label="Elegí una radio"
