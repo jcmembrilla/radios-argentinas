@@ -5,13 +5,14 @@
  * ============================================================
  *
  *  Renderiza en build time (HTML estático): head con SEO/OG, favicon,
- *  manifest PWA, fondo de la app, footer y el script de la fecha.
+ *  manifest PWA, fondo de la app y footer con el almanaque.
  *  Todo lo interactivo se hidrata dentro de <slot /> (islas React).
  *
  *  Estilos: Tailwind v4 (global.css provee tokens y utilidades custom;
  *  el resto son utilidades aplicadas directo en el markup).
  */
 import '../styles/global.css';
+import Almanac from '../components/Almanac.jsx';
 
 interface Props {
   title?: string;
@@ -56,30 +57,17 @@ const {
     <title>{title}</title>
   </head>
 
-  <!-- bg-flag: utilidad custom (bandera + overlay).
+  <!-- bg-app: utilidad custom (base azul-negra + glow radial celeste).
        El body es columna flex: main crece (flex-1) y el footer queda abajo. -->
-  <body class="bg-flag flex min-h-svh flex-col font-sans antialiased text-fg">
+  <body class="bg-app flex min-h-svh flex-col font-sans antialiased text-fg">
     <slot />
 
-    <footer class="flex flex-col items-center gap-1 px-4 pt-6 pb-8 text-center">
-      <div>
-        <h3 class="mb-1 text-[1.1rem]">Siempre a tu alcance</h3>
-        <p class="text-[0.9rem] text-white/70">
-          Una aplicación pensada para ser práctica y sencilla
-        </p>
-      </div>
-      <!-- La completa el script de abajo con la fecha del día -->
-      <span id="fecha-actual" class="mt-2 text-[0.85rem] text-white/70"></span>
+    <footer class="flex flex-col items-center gap-2 px-4 pt-6 pb-8 text-center">
+      <!-- Almanaque: fecha + clima automático (por IP, sin prompts).
+           client:idle: se hidrata cuando el navegador está libre,
+           después del player que es lo crítico. -->
+      <Almanac client:idle />
+      <p class="text-[0.8rem] text-white/40">Siempre a tu alcance</p>
     </footer>
-
-    <!-- Fecha actual (d/m/aaaa): se calcula en el navegador para no quedar
-         congelada con la fecha del build. is:inline = sin procesar por Vite. -->
-    <script is:inline>
-      const el = document.getElementById('fecha-actual');
-      if (el) {
-        const f = new Date();
-        el.textContent = `${f.getDate()}/${f.getMonth() + 1}/${f.getFullYear()}`;
-      }
-    </script>
   </body>
 </html>

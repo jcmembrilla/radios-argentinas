@@ -3,10 +3,13 @@
    ============================================================
    Tailwind 4 es CSS-first: sin tailwind.config.js.
    - @theme: tokens que generan utilidades (bg-celeste, text-fg…)
-   - @utility: utilidades custom para imágenes de fondo y flechas
+   - @utility: utilidades custom para el fondo y la flecha del select
    - @layer components: pseudo-elementos que las utilidades no cubren
    Todo lo demás (layout, spacing, estados, responsive) vive como
    utilidades directamente en el markup de cada componente.
+
+   Dirección de arte (v3): dark mode único y sutil, columna abierta
+   con glow radial celeste. Sin imágenes de fondo.
    ============================================================ */
 
 @import 'tailwindcss';
@@ -15,15 +18,18 @@
    Tokens de diseño
    ------------------------------------------------------------ */
 @theme {
-  /* Fondo y texto base */
-  --color-bg: #0b0b0b;
-  --color-fg: #f6f6f6;
+  /* Fondo general: azul-negro profundo (base del glow) */
+  --color-base: #0a0f14;
 
-  /* Celeste de la bandera argentina (acentos, foco, spinner) */
+  /* Celeste de la bandera argentina + variante clara para detalles */
   --color-celeste: #74acdf;
+  --color-celeste-soft: #a8cbea;
 
   /* Errores: borde del botón cuando el stream falla */
   --color-danger: #e5484d;
+
+  /* Texto base */
+  --color-fg: #f6f6f6;
 
   /* Tipografía base del sitio (preflight la aplica globalmente) */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -31,9 +37,14 @@
     sans-serif;
 }
 
-/* Foco de teclado visible en TODOS los controles interactivos
-   (un solo lugar: no hay que repetir focus-visible: en cada componente) */
+/* Base: foco de teclado visible en TODOS los controles (un solo lugar)
+   y color-scheme dark para que los controles nativos (dropdown del
+   <select>, scrollbars) también sean oscuros. */
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-celeste);
     outline-offset: 3px;
@@ -44,21 +55,21 @@
    Utilidades custom
    ------------------------------------------------------------ */
 
-/* Fondo de la app: bandera oscurecida al 80% para que el texto
-   blanco siempre tenga contraste. "fixed" evita que scrollee. */
-@utility bg-flag {
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
-    url('../assets/images/background.webp');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-color: var(--color-bg); /* fallback si la imagen no carga */
+/* Fondo de la app: base azul-negra con un glow radial celeste
+   que nace arriba del viewport. Sutil: 18% de opacidad al centro. */
+@utility bg-app {
+  background-color: var(--color-base);
+  background-image: radial-gradient(
+    ellipse 90% 55% at 50% -10%,
+    color-mix(in srgb, var(--color-celeste) 18%, transparent),
+    transparent
+  );
+  background-repeat: no-repeat;
 }
 
-/* Flecha del selector: SVG inline en base64 (cero archivos extra) */
+/* Flecha del selector: SVG inline URL-encoded (legible, cero archivos) */
 @utility select-arrow {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmc%22IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgc3R5bGU9ImZpbGw6IzMzMztpbnZpc2libGV0YWN0aW9uOm5vbmUiPjxwYXRoIGQ9Ik03LjEwNyA0LjI5MyAxMiA5LjE3OSAxNi44OTMgNC4yOTMgMTguMDA2IDUuNDAzIDEyIDExLjQzNCA1Ljk5NCA1LjQwM3oiLz48L3N2Zz4=");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cpath fill='%23a8cbea' d='M7.107 4.293 12 9.179 16.893 4.293 18.006 5.403 12 11.434 5.994 5.403z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
 }
@@ -66,7 +77,8 @@
 /* ------------------------------------------------------------
    Slider de volumen: los pseudo-elementos ::-webkit-slider-thumb
    y ::-moz-range-thumb no se pueden estilizar con utilidades.
-   La base del input va con utilidades en el markup; acá solo el thumb.
+   El "relleno" del track lo pinta el componente con un gradiente
+   inline según el porcentaje; acá solo el pulgar (blanco).
    ------------------------------------------------------------ */
 @layer components {
   .range-field::-webkit-slider-thumb {
@@ -75,15 +87,24 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: var(--color-celeste);
+    background: #f6f6f6;
     border: none;
+    box-shadow: 0 0 0 4px color-mix(in srgb, #f6f6f6 15%, transparent);
   }
 
   .range-field::-moz-range-thumb {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: var(--color-celeste);
+    background: #f6f6f6;
     border: none;
+    box-shadow: 0 0 0 4px color-mix(in srgb, #f6f6f6 15%, transparent);
+  }
+
+  /* Opciones del dropdown del <select>: algunos navegadores (Firefox)
+     no heredan el esquema oscuro del select padre. */
+  .select-field option {
+    background-color: var(--color-base);
+    color: var(--color-fg);
   }
 }
