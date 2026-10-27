@@ -1,2 +1,4 @@
+# Configuración de build para Netlify
 [build]
-publish = ""
+  command = "npm run build"   # genera la versión de producción con Vite
+  publish = "dist"            # carpeta que Netlify publica

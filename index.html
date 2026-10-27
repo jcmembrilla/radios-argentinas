@@ -1,37 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--
+  Radios Argentinas — página principal.
+
+  Estructura de la página:
+  1. Reproductor: título, botón play/pause, slider de volumen y selector de radios.
+  2. Footer: eslogan y fecha actual.
+
+  Toda la interactividad la maneja src/index.js (cargado al final del body).
+-->
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
+    <!-- Escala correcta en dispositivos móviles -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Descripción para buscadores y pestañas -->
+    <meta name="description" content="Escuchá en vivo las principales radios AM y FM de Argentina. Reproductor simple, liviano y al instante.">
+    <!-- Color de la barra del navegador en móviles -->
+    <meta name="theme-color" content="#0b0b0b">
+
+    <!-- Open Graph: vista previa al compartir el enlace en redes sociales -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Radios Argentinas">
+    <meta property="og:description" content="Escuchá en vivo las principales radios AM y FM de Argentina.">
+    <meta property="og:url" content="https://radiosarg.netlify.app/">
+    <meta property="og:image" content="https://radiosarg.netlify.app/mic.png">
+
     <link rel="shortcut icon" href="/mic.png" type="image/png" />
     <link rel="stylesheet" href="./src/style.css">
     <title>Radios Argentinas</title>
 </head>
 
 <body class="bg">
-    <div class="centerBotton">
+    <!-- Reproductor: los ids son las referencias que usa src/index.js -->
+    <main class="player">
         <h1>Radios Argentinas</h1>
+
         <span id="play-pause-button">
             <img id="play-pause-icon" alt="Play/Pause" width="140" height="140" src="./src/assets/images/play.png"
                 class="boton" />
         </span>
+
         <div class="mt-3">
             <input type="range" min="0" max="1" id="volume-slider" step="0.01" />
         </div>
+
         <div class="mt-3">
             <select id="radio-selector" class="select-container">
-                <option value="">Elije tu radio</option>
+                <!-- value vacío = sin radio elegida; el resto lo agrega index.js -->
+                <option value="">Elegí tu radio</option>
             </select>
         </div>
-    </div>
+    </main>
 
     <footer>
         <div>
             <h3>Siempre a tu alcance</h3>
-            <p>Una aplicación pensada para ser practica y sencilla</p>
+            <p>Una aplicación pensada para ser práctica y sencilla</p>
         </div>
         <div>
+            <!-- La completa index.js con la fecha del día -->
             <span id="fecha-actual"></span>
         </div>
     </footer>
