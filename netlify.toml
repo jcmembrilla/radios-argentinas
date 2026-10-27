@@ -2,3 +2,10 @@
 [build]
   command = "npm run build"   # genera la versión de producción con Astro
   publish = "dist"            # carpeta que Netlify publica
+
+# Node fijado: sin esto, Netlify compila con la versión que tenía por
+# defecto el sitio cuando fue creado (vieja, pre-Astro). Los pisos
+# reales del proyecto son Astro 5 (recomienda >=22.12.0) y
+# @tailwindcss/oxide (Tailwind v4, exige >=20).
+[build.environment]
+  NODE_VERSION = "24"
