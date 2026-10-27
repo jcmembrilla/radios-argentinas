@@ -22,7 +22,7 @@ import radios from '../data/radios.json';
   <main
     class="flex flex-1 flex-col items-center justify-center gap-9 px-4 py-10 text-center"
   >
-    <!-- Título: dos líneas, tracking amplio + acento celeste mínimo -->
+    <!-- Título: dos líneas, tracking amplio + Sol de Mayo dorado -->
     <div class="flex flex-col items-center gap-4">
       <h1
         class="flex flex-col items-center gap-1 text-[clamp(1.6rem,5vw,2.6rem)] font-light tracking-[0.4em] uppercase"
@@ -30,10 +30,20 @@ import radios from '../data/radios.json';
         <span class="-mr-[0.4em]">Radios</span>
         <span class="-mr-[0.4em]">Argentinas</span>
       </h1>
-      <!-- Acento: línea · punto · línea -->
+      <!-- Acento: línea · Sol de Mayo · línea -->
       <div class="flex items-center gap-2" aria-hidden="true">
         <span class="h-px w-10 bg-celeste/50"></span>
-        <span class="size-1.5 rounded-full bg-celeste"></span>
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5 fill-sol stroke-sol [filter:drop-shadow(0_0_6px_rgba(246,180,14,0.55))]"
+        >
+          <circle cx="12" cy="12" r="4"></circle>
+          <g stroke-width="2" stroke-linecap="round" fill="none">
+            <path
+              d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"
+            ></path>
+          </g>
+        </svg>
         <span class="h-px w-10 bg-celeste/50"></span>
       </div>
     </div>

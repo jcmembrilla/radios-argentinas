@@ -1,9 +1,12 @@
 /**
  * VolumeSlider — control de volumen (input range nativo).
  *
+ * Centrado: el contenedor mide EXACTAMENTE lo que el track (w-50), así el
+ * track queda centrado bajo el botón por el flex del player; el % flota
+ * fuera del flujo (absolute) para no desplazarlo.
+ *
  * El track se "llena" de celeste hasta el porcentaje actual mediante un
- * gradiente inline (los pseudo-elementos del thumb viven en global.css,
- * clase .range-field: son lo único que las utilidades no pueden tocar).
+ * gradiente inline; el pulgar vive en global.css (.range-field).
  */
 export default function VolumeSlider({ volume, onChange }) {
   const percentage = Math.round(volume * 100);
@@ -12,7 +15,7 @@ export default function VolumeSlider({ volume, onChange }) {
   const fill = `linear-gradient(to right, var(--color-celeste) ${percentage}%, rgba(255,255,255,0.15) ${percentage}%)`;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="relative w-50 max-[480px]:w-40">
       <input
         type="range"
         min="0"
@@ -21,11 +24,11 @@ export default function VolumeSlider({ volume, onChange }) {
         value={volume}
         onChange={(event) => onChange(parseFloat(event.target.value))}
         style={{ background: fill }}
-        className="range-field h-1.5 w-50 max-w-[55vw] cursor-pointer rounded-full max-[480px]:w-40"
+        className="range-field h-1.5 w-full cursor-pointer rounded-full"
         aria-label="Volumen"
       />
       <output
-        className="min-w-9 text-[0.85rem] tabular-nums text-white/70"
+        className="absolute top-1/2 -right-12 -translate-y-1/2 text-[0.85rem] tabular-nums text-white/70"
         aria-hidden="true"
       >
         {percentage}%

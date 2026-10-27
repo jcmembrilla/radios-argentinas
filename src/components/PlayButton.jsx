@@ -1,5 +1,5 @@
 /**
- * PlayButton — botón perilla de radio.
+ * PlayButton — botón perilla de radio con dial de detents.
  *
  * Comportamiento de "modo radio":
  *  - ▶ solo en idle/error (pide una acción al usuario).
@@ -7,17 +7,18 @@
  *    el botón indica que la radio está "prendida", y el mismo click
  *    alterna (como una perilla en ON).
  *
- * Animación (CSS puro, sin librerías):
- *  - Muesca celeste en el aro que gira 72° por press (5 posiciones/vuelta),
- *    como el dial de una radio antigua.
- *  - Crossfade play↔pausa con mini-rotación.
+ * El dial (CSS puro, sin librerías):
+ *  - Anillo de ticks (detents): círculo SVG punteado que rota 30° por
+ *    press — los ticks "encastran" en la próxima posición.
+ *  - Aguja (muesca celeste): gira 180° por press, como un selector.
+ *  - Overshoot mecánico: cubic-bezier con rebote al asentar (700ms).
  *  - motion-reduce: sin transiciones.
  *
  * Estados visuales:
- *  - playing  → ⏸ visible + muesca girando por press
+ *  - playing  → ⏸ visible + dial girando por press
  *  - paused   → ⏸ visible (modo radio en pausa)
  *  - loading  → spinner (conectando al stream)
- *  - error    → ▶ + aro rojo (reintentar)
+ *  - error    → ▶ + dial rojo (reintentar)
  *  - default  → ▶
  */
 import { useState } from 'react';
@@ -33,6 +34,9 @@ const GRADIENT_DEFS = (id) => (
   </defs>
 );
 
+/** Easing con rebote: pasa de largo y vuelve a asentar (efecto "clic"). */
+const DIAL_TIMING = 'duration-700 ease-[cubic-bezier(.34,1.56,.64,1)]';
+
 export default function PlayButton({ state, onToggle, disabled }) {
   const isPlaying = state === PLAYER_STATE.PLAYING;
   const isLoading = state === PLAYER_STATE.LOADING;
@@ -41,8 +45,9 @@ export default function PlayButton({ state, onToggle, disabled }) {
   // Modo radio: emisora elegida y el botón en ON (sonando o pausado)
   const inRadioMode = isPlaying || state === PLAYER_STATE.PAUSED;
 
-  // Perilla: cada press gira la muesca 72° (5 posiciones por vuelta)
-  const [notchAngle, setNotchAngle] = useState(0);
+  // Dial: 12 detents → el anillo avanza 30° por press; la aguja gira 180°
+  const [dialAngle, setDialAngle] = useState(0);
+  const [needleAngle, setNeedleAngle] = useState(0);
 
   // La etiqueta describe la ACCIÓN del click; el ícono, el modo actual
   const label = isPlaying
@@ -67,31 +72,47 @@ export default function PlayButton({ state, onToggle, disabled }) {
         'max-[480px]:size-28',
       ].join(' ')}
       onClick={() => {
-        setNotchAngle((a) => a + 72);
+        setDialAngle((a) => a + 30);
+        setNeedleAngle((a) => a + 180);
         onToggle();
       }}
       disabled={disabled}
       aria-label={label}
       title={label}
     >
-      {/* Aro de la perilla: la muesca gira 72° por cada press.
-          (el aro gira con la muesca; al ser uniforme, solo la muesca
-          parece moverse — como un dial real) */}
+      {/* Anillo de detents: círculo punteado (12 ticks), rota 30° por press */}
       <span
         aria-hidden="true"
-        className={[
-          'absolute inset-0 rounded-full border transition-[transform,border-color]',
-          'duration-500 ease-out motion-reduce:transition-none',
-          isError ? 'border-danger' : 'border-celeste/40',
-        ].join(' ')}
-        style={{ transform: `rotate(${notchAngle}deg)` }}
+        className={`absolute inset-0 transition-transform ${DIAL_TIMING} motion-reduce:transition-none`}
+        style={{ transform: `rotate(${dialAngle}deg)` }}
+      >
+        <svg viewBox="0 0 100 100" className="absolute inset-0 size-full">
+          <circle
+            cx="50"
+            cy="50"
+            r="47.5"
+            fill="none"
+            // 12 marcas: circunferencia ≈ 298.5 → dasharray 1 + 23.87 por tick
+            strokeDasharray="1 23.87"
+            strokeLinecap="round"
+            strokeWidth="2.5"
+            stroke={isError ? '#e5484d' : 'rgba(246, 246, 246, 0.25)'}
+          />
+        </svg>
+      </span>
+
+      {/* Aguja (muesca celeste): gira 180° por press, como selector */}
+      <span
+        aria-hidden="true"
+        className={`absolute inset-0 transition-transform ${DIAL_TIMING} motion-reduce:transition-none`}
+        style={{ transform: `rotate(${needleAngle}deg)` }}
       >
         <span
           className={[
-            'absolute -top-[3px] left-1/2 size-1.5 -translate-x-1/2 rounded-full',
+            'absolute -top-[4px] left-1/2 size-2 -translate-x-1/2 rounded-full',
             isError
               ? 'bg-danger'
-              : 'bg-celeste-soft shadow-[0_0_6px_rgba(116,172,223,0.9)]',
+              : 'bg-celeste-soft shadow-[0_0_8px_rgba(116,172,223,0.9)]',
           ].join(' ')}
         />
       </span>
