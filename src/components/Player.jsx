@@ -64,7 +64,7 @@ export default function Player({ radios }) {
   useEffect(() => {
     try {
       const savedUrl = localStorage.getItem(STORAGE_KEYS.radio);
-      if (savedUrl && radios.some((r) => r.url === savedUrl)) {
+      if (savedUrl && radios.some((r) => r.streamUrl === savedUrl)) {
         setSelectedUrl(savedUrl);
       }
       const savedVolume = localStorage.getItem(STORAGE_KEYS.volume);
@@ -91,7 +91,7 @@ export default function Player({ radios }) {
 
   // --- Datos derivados ----------------------------------------------------
   const selectedRadio = useMemo(
-    () => radios.find((r) => r.url === selectedUrl),
+    () => radios.find((r) => r.streamUrl === selectedUrl),
     [radios, selectedUrl],
   );
 
@@ -152,6 +152,11 @@ export default function Player({ radios }) {
       <p className="min-h-6 text-[0.95rem] text-white/70" role="status" aria-live="polite">
         {statusContent(state, selectedRadio?.name ?? '')}
       </p>
+
+      {/* Género de la emisora (del catálogo): solo si tiene uno */}
+      {selectedRadio?.genre && (
+        <p className="-mt-4 text-[0.8rem] text-white/45">{selectedRadio.genre}</p>
+      )}
     </div>
   );
 }

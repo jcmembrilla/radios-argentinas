@@ -1,62 +1,146 @@
 [
   {
-    "key": 1,
+    "id": "am-750",
     "name": "AM 750",
-    "url": "https://us-b5-p-e-kj2-audio.cdn.mdstrm.com/live-audio-aw-bkp/6237761f64b72676f05cf6ab"
+    "dial": "",
+    "location": "Buenos Aires",
+    "genre": "Noticias / Deportes",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/AM750AAC.aac",
+    "homepage": "https://www.am750.com.ar/"
   },
   {
-    "key": 2,
+    "id": "rivadavia",
     "name": "Rivadavia",
-    "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RIVADAVIAAAC.aac"
+    "dial": "630 AM",
+    "location": "Buenos Aires",
+    "genre": "Noticias / Actualidad",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/RIVADAVIAAAC.aac",
+    "homepage": "https://rivadavia.com.ar/"
   },
   {
-    "key": 3,
+    "id": "rock-pop",
     "name": "Rock & Pop",
-    "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKANDPOPAAC.aac"
+    "dial": "95.9 FM",
+    "location": "Buenos Aires",
+    "genre": "Rock / Pop",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKANDPOPAAC.aac",
+    "homepage": "https://fmrockandpop.com/"
   },
   {
-    "key": 4,
+    "id": "radio-uno",
     "name": "Radio Uno",
-    "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/UNOAAC.aac"
+    "dial": "103.1 FM",
+    "location": "",
+    "genre": "",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/UNOAAC.aac",
+    "homepage": ""
   },
   {
-    "key": 5,
+    "id": "la-red",
     "name": "La Red",
-    "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/LA_RED_AM910AAC.aac"
+    "dial": "910 AM",
+    "location": "Buenos Aires",
+    "genre": "Deportes / Noticias",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/LA_RED_AM910AAC.aac",
+    "homepage": "https://www.lared.am/"
   },
   {
-    "key": 6,
-    "name": "Continental",
-    "url": "https://20833.live.streamtheworld.com/CONTINENTALAAC.aac"
+    "id": "radio-continental",
+    "name": "Radio Continental",
+    "dial": "590 AM",
+    "location": "Buenos Aires",
+    "genre": "Noticias / Deportes / Campo",
+    "streamUrl": "https://frontend.radiohdvivo.com/continental/live",
+    "homepage": "https://www.continental.com.ar/"
   },
   {
-    "key": 7,
+    "id": "la-100",
     "name": "La 100",
-    "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/FM999_56.mp3"
+    "dial": "99.9 FM",
+    "location": "Buenos Aires",
+    "genre": "Pop / Éxitos / Entretenimiento",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/FM999_56.mp3",
+    "homepage": "https://la100.cienradios.com/"
   },
   {
-    "key": 8,
-    "name": "El Destape",
-    "url": "https://ipanel.instream.audio/8004/stream"
-  },
-  {
-    "key": 9,
+    "id": "radio-mitre",
     "name": "Radio Mitre",
-    "url": "http://buecrplb01.cienradios.com.ar/Mitre790.aac"
+    "dial": "790 AM",
+    "location": "Buenos Aires",
+    "genre": "Noticias / Actualidad",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/AM790_56AAC_SC",
+    "homepage": "https://radiomitre.cienradios.com/"
   },
   {
-    "key": 10,
-    "name": "La 990",
-    "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/AM990AAC.aac"
+    "id": "splendida-990",
+    "name": "Spléndida",
+    "dial": "990 AM",
+    "location": "Buenos Aires",
+    "genre": "Noticias / Actualidad",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/AM990AAC.aac",
+    "homepage": "https://splendidam990.com/"
   },
   {
-    "key": 11,
-    "name": "Aspen",
-    "url": "https://mdstrm.com/audio/60a2745ff943100826374a70/icecast.audio"
+    "id": "aspen-1023",
+    "name": "Radio Aspen",
+    "dial": "102.3 FM",
+    "location": "Buenos Aires",
+    "genre": "Clásicos / Pop / Rock",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/ASPENAAC.aac",
+    "homepage": "https://fmaspen.com/"
   },
   {
-    "key": 12,
+    "id": "cultura",
     "name": "Cultura",
-    "url": "https://usa5.fastcast4u.com/proxy/radiocultura?mp=/1"
+    "dial": "",
+    "location": "",
+    "genre": "Variedades",
+    "streamUrl": "https://usa5.fastcast4u.com/proxy/radiocultura?mp=/1",
+    "homepage": "https://www.fmradiocultura.com.ar/"
+  },
+  {
+    "id": "cadena-3",
+    "name": "Cadena 3 Argentina",
+    "dial": "AM 700",
+    "location": "Córdoba / Nacional",
+    "genre": "Noticias / Generalista",
+    "streamUrl": "https://playerservices.streamtheworld.com/api/livestream-redirect/radio3.mp3",
+    "homepage": "https://www.cadena3.com/"
+  },
+  {
+    "id": "mega-983",
+    "name": "Mega 98.3",
+    "dial": "98.3 FM",
+    "location": "Buenos Aires",
+    "genre": "Rock Nacional",
+    "streamUrl": "https://mega.stweb.tv/mega983/live/playlist.m3u8",
+    "homepage": "https://www.radiomega.fm/"
+  },
+  {
+    "id": "pop-radio-1015",
+    "name": "Pop Radio",
+    "dial": "101.5 FM",
+    "location": "Buenos Aires",
+    "genre": "Pop / Entretenimiento / Humor",
+    "streamUrl": "https://popradio.stweb.tv/popradio/live/playlist.m3u8",
+    "homepage": "https://www.popradio.com.ar/"
+  },
+  {
+    "id": "radio-10",
+    "name": "Radio 10",
+    "dial": "710 AM",
+    "location": "Buenos Aires",
+    "genre": "Noticias / Política / Opinión",
+    "streamUrl": "https://radio10.stweb.tv/radio10/live/playlist.m3u8",
+    "homepage": "https://www.radio10.com.ar/"
+  },
+  {
+    "id": "vale-975",
+    "name": "Vale 97.5",
+    "dial": "97.5 FM",
+    "location": "Buenos Aires",
+    "genre": "Música Romántica / Pop Latino",
+    "streamUrl": "https://vale.stweb.tv/vale/live/playlist.m3u8",
+    "homepage": "https://www.vale975.com.ar/"
   }
 ]

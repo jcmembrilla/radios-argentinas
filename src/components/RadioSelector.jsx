@@ -20,8 +20,8 @@ export default function RadioSelector({ radios, selectedUrl, onChange }) {
       >
         <option value="">Elegí tu radio</option>
         {radios.map((radio) => (
-          <option key={radio.key} value={radio.url}>
-            {radio.name}
+          <option key={radio.id} value={radio.streamUrl}>
+            {radio.dial ? `${radio.name} · ${radio.dial}` : radio.name}
           </option>
         ))}
       </select>
