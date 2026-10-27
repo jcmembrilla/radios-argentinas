@@ -16,6 +16,7 @@ La aplicación está disponible en producción: **[radiosarg.netlify.app](https:
 
 - 🎙️ **Streaming en vivo** de las principales radios AM y FM de Argentina (AM 750, Rivadavia, La Red, Radio Mitre, Aspen y más).
 - ▶️ **Reproductor confiable**: máquina de estados basada en eventos reales del audio, con spinner de conexión y avisos de error si una radio cae.
+- 🎛️ **Perilla de radio**: el botón gira como un dial en cada cambio y mantiene el modo visible (⏸) mientras tengas una emisora elegida; cambiar de radio no pausa, salta directo a la nueva.
 - 📱 **PWA instalable**: agregala a la pantalla de inicio de tu celular y controlá la reproducción desde la pantalla de bloque (Media Session API).
 - 🌤️ **Almanaque**: fecha del día y clima actual (temperatura + condición) según tu ubicación, detectado automáticamente sin pedir permisos.
 - 🌙 **Dark mode único**: interfaz minimalista con glow celeste, sin imágenes de fondo.
@@ -129,6 +130,15 @@ Las sugerencias son bienvenidas, especialmente **nuevas radios**:
 2. Creá una rama con tu cambio (`git checkout -b nueva-radio`).
 3. Agregá la emisora a `src/data/radios.json` siguiendo el formato de la sección anterior.
 4. Abrí un Pull Request describiendo la radio agregada.
+
+## ⚖️ Clarificación sobre el Uso de Contenidos y Transmisiones
+
+Esta aplicación opera exclusivamente como un directorio de enlaces y un reproductor cliente.
+
+- **Transmisión Directa:** El audio reproducido proviene de los servidores oficiales de streaming público de cada emisora. La aplicación no retransmite, aloja, modifica ni procesa el flujo de audio.
+- **Métricas y Audiencia:** Las conexiones se realizan directamente desde el dispositivo del usuario hacia el servidor de la radio, garantizando que el oyente sea contabilizado de forma legítima en las métricas y estadísticas oficiales de cada emisora.
+- **Publicidad Original:** Se respeta en su totalidad la pauta publicitaria y el contenido emitidos por la radio en su transmisión de origen.
+- **Propiedad Intelectual:** Todos los nombres de las emisoras, logotipos y marcas pertenecen a sus respectivos dueños. Si la administración de alguna emisora desea modificar o remover su enlace de este directorio, puede solicitarlo a través de membrillajc@gmail.com.
 
 ## 📄 Licencia
 

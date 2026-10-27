@@ -45,7 +45,7 @@ export default defineConfig({
         // Precachea el app shell (HTML/CSS/JS/imgs) para que la UI
         // cargue incluso sin conexión. La lista de radios va embebida en la
         // página (importada en build time), así que tampoco necesita caché.
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Los streams de radio NO se cachean: son en vivo y de otro origen.
         // Workbox solo intercepta URLs que coinciden con sus rutas; todo lo
         // demás (cross-origin, media) pasa directo a la red.
