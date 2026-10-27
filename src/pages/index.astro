@@ -1,0 +1,25 @@
+---
+/**
+ * ============================================================
+ *  Página principal — Radios Argentinas
+ * ============================================================
+ *
+ *  Todo el HTML de esta página se genera en build time.
+ *  La lista de radios se importa acá (build time) y se pasa como prop
+ *  a la isla de React: el navegador no hace ningún fetch para conocer
+ *  las emisoras.
+ *
+ *  client:load: el player se hidrata apenas carga la página, porque es
+ *  el núcleo interactivo de la app.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Player from '../components/Player.jsx';
+import radios from '../data/radios.json';
+---
+
+<BaseLayout>
+  <main class="player">
+    <h1 class="player__title">Radios Argentinas</h1>
+    <Player client:load radios={radios} />
+  </main>
+</BaseLayout>

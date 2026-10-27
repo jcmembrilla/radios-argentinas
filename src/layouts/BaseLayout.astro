@@ -1,0 +1,76 @@
+---
+/**
+ * ============================================================
+ *  BaseLayout — estructura común de todas las páginas
+ * ============================================================
+ *
+ *  Renderiza en build time (HTML estático): head con SEO/OG, favicon,
+ *  manifest PWA, fondo de la app, footer y el script de la fecha.
+ *  Todo lo interactivo se hidrata dentro de <slot /> (islas React).
+ */
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const SITE_URL = 'https://radiosarg.netlify.app';
+
+const {
+  title = 'Radios Argentinas',
+  description = 'Escuchá en vivo las principales radios AM y FM de Argentina. Reproductor simple, liviano y al instante.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <!-- Color de la barra del navegador en móviles -->
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph: vista previa al compartir en redes sociales -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={SITE_URL} />
+    <meta property="og:image" content={`${SITE_URL}/icons/icon-512.png`} />
+    <meta property="og:locale" content="es_AR" />
+
+    <!-- Favicon + íconos PWA -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <!-- PWA: @vite-pwa/astro genera ambos archivos durante el build pero no
+         los inyecta en el HTML de Astro, por eso se referencian acá. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script is:inline src="/registerSW.js" defer></script>
+
+    <title>{title}</title>
+  </head>
+
+  <body class="bg">
+    <slot />
+
+    <footer>
+      <div class="footer__slogan">
+        <h3>Siempre a tu alcance</h3>
+        <p>Una aplicación pensada para ser práctica y sencilla</p>
+      </div>
+      <!-- La completa el script de abajo con la fecha del día -->
+      <span id="fecha-actual" class="footer__fecha"></span>
+    </footer>
+
+    <!-- Fecha actual (d/m/aaaa): se calcula en el navegador para no quedar
+         congelada con la fecha del build. is:inline = sin procesar por Vite. -->
+    <script is:inline>
+      const el = document.getElementById('fecha-actual');
+      if (el) {
+        const f = new Date();
+        el.textContent = `${f.getDate()}/${f.getMonth() + 1}/${f.getFullYear()}`;
+      }
+    </script>
+  </body>
+</html>
