@@ -1,0 +1,297 @@
+/* ============================================================
+   Radios Argentinas — estilos globales
+   ============================================================
+   Secciones:
+   1. Variables y base
+   2. Fondo de la aplicación
+   3. Layout general (main + footer)
+   4. Reproductor (botón play/pause, volumen, selector, estado)
+   5. Utilidades y accesibilidad
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Variables y base
+   ------------------------------------------------------------ */
+:root {
+  --bg: #0b0b0b;
+  --overlay: rgba(0, 0, 0, 0.8);      /* oscurece el fondo para contraste */
+  --celeste: #74acdf;                  /* celeste de la bandera argentina */
+  --text: #f6f6f6;
+  --text-muted: rgba(246, 246, 246, 0.7);
+  --danger: #e5484d;
+  --radius: 10px;
+  --play-size: 140px;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------
+   2. Fondo de la aplicación
+   Bandera argentina en WebP (-67% de peso vs. el JPG original)
+   con overlay oscuro. "fixed" evita el scroll del fondo.
+   ------------------------------------------------------------ */
+.bg {
+  background-image:
+    linear-gradient(var(--overlay), var(--overlay)),
+    url('../assets/images/background.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: var(--bg); /* fallback si la imagen no carga */
+}
+
+/* ------------------------------------------------------------
+   3. Layout general
+   main ocupa el alto restante y centra el reproductor;
+   el footer fluye después (sin position:absolute, que se
+   superponía en pantallas bajas).
+   ------------------------------------------------------------ */
+body.bg {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+main.player {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.player__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  letter-spacing: 0.02em;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+  padding: 1.5rem 1rem 2rem;
+}
+
+.footer__slogan h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.footer__slogan p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.footer__fecha {
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ------------------------------------------------------------
+   4. Reproductor
+   ------------------------------------------------------------ */
+.player-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* --- Botón play/pause (antes: <span> + <img> PNG) ------------- */
+.play-button {
+  width: var(--play-size);
+  height: var(--play-size);
+  border-radius: 50%;
+  border: 2px solid rgba(246, 246, 246, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+}
+
+.play-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(246, 246, 246, 0.5);
+}
+
+.play-button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.play-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.play-button--error {
+  border-color: var(--danger);
+}
+
+.play-button__icon {
+  width: 56px;
+  height: 56px;
+}
+
+/* Spinner: feedback mientras conecta con el stream */
+.play-button__spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(246, 246, 246, 0.25);
+  border-top-color: var(--celeste);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Control de volumen -------------------------------------- */
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.volume__slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 200px;
+  max-width: 55vw;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(246, 246, 246, 0.25);
+  outline-offset: 4px;
+  cursor: pointer;
+}
+
+/* Pulgar del slider (Chrome/Safari) */
+.volume__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--celeste);
+  border: none;
+}
+
+/* Pulgar del slider (Firefox) */
+.volume__slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--celeste);
+  border: none;
+}
+
+.volume__value {
+  min-width: 3.5ch;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Selector de radios ---------------------------------------- */
+.selector__select {
+  font-family: inherit;
+  font-weight: bold;
+  width: 220px;
+  max-width: 80vw;
+  height: 40px;
+  border-radius: var(--radius);
+  border: 1px solid #ddd;
+  padding: 5px 36px 5px 14px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  background-color: #fff;
+  /* Flecha custom (SVG en base64, sin imagen extra) */
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmc%22IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgc3R5bGU9ImZpbGw6IzMzMztpbnZpc2libGV0YWN0aW9uOm5vbmUiPjxwYXRoIGQ9Ik03LjEwNyA0LjI5MyAxMiA5LjE3OSAxNi44OTMgNC4yOTMgMTguMDA2IDUuNDAzIDEyIDExLjQzNCA1Ljk5NCA1LjQwM3oiLz48L3N2Zz4=");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.selector__select:hover {
+  border-color: #ccc;
+}
+
+.selector__select:focus {
+  outline: none;
+  border-color: var(--celeste);
+}
+
+/* --- Línea de estado -------------------------------------------- */
+.player-status {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ------------------------------------------------------------
+   5. Utilidades y accesibilidad
+   ------------------------------------------------------------ */
+
+/* Etiqueta visualmente oculta pero legible por lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Foco de teclado visible en todos los controles */
+:focus-visible {
+  outline: 2px solid var(--celeste);
+  outline-offset: 3px;
+}
+
+/* Respetar la preferencia de menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .play-button__spinner {
+    animation-duration: 2s;
+  }
+  .play-button {
+    transition: none;
+  }
+}
+
+/* Pantallas chicas: botón y slider más compactos */
+@media (max-width: 480px) {
+  :root {
+    --play-size: 110px;
+  }
+  .play-button__icon {
+    width: 44px;
+    height: 44px;
+  }
+  .volume__slider {
+    width: 160px;
+  }
+}

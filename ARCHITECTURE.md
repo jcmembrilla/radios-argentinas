@@ -9,113 +9,161 @@ Este documento describe la arquitectura de la aplicación, las decisiones técni
 3. [Estructura del proyecto](#-estructura-del-proyecto)
 4. [Flujo de datos](#-flujo-de-datos)
 5. [Máquina de estados del reproductor](#-máquina-de-estados-del-reproductor)
-6. [Pipeline de deploy](#-pipeline-de-deploy)
-7. [Evolución planificada](#-evolución-planificada)
+6. [Arquitectura PWA](#-arquitectura-pwa)
+7. [Pipeline de deploy](#-pipeline-de-deploy)
+8. [Historial de arquitectura](#-historial-de-arquitectura)
 
 ---
 
 ## 🔭 Visión general
 
-Radios Argentinas es una **aplicación web estática de una sola página** para escuchar radios argentinas en vivo. No tiene backend propio: la lista de emisoras se sirve como archivo estático y el audio se transmite directo desde los CDN de cada radio (StreamTheWorld, MDStrm, ICEcast, etc.).
+Radios Argentinas es una **aplicación web estática de una sola página** para escuchar radios argentinas en vivo, instalable como PWA. No tiene backend propio: el catálogo de emisoras se resuelve en build time y el audio se transmite directo desde los CDN de cada radio (StreamTheWorld, MDStrm, ICEcast, etc.).
 
 ```
-┌─────────────────────────── Navegador ───────────────────────────┐
-│                                                                  │
-│   index.html ──► src/index.js ──► <audio> (elemento oculto)      │
-│       │                  │                    │                  │
-│   src/style.css     fetch /radios.json         │                  │
-│                           │                    │                  │
-└───────────────────────────┼────────────────────┼──────────────────┘
-                            ▼                    ▼
-                    CDN estático (Netlify)   CDN de streaming de cada radio
+┌───────────────────────────── Navegador ─────────────────────────────┐
+│                                                                      │
+│  HTML estático (Astro)                                               │
+│      │                                                               │
+│      ├─► Isla React <Player> ──► useAudio ──► <audio> oculto         │
+│      │        (radios via props, sin fetch)          │               │
+│      └─► Service Worker (app shell offline)          │               │
+│                                                      │               │
+└──────────────────────────────────────────────────────┼───────────────┘
+                                                       ▼
+                                        CDN de streaming de cada radio
 ```
 
 **Características del sistema:**
 
-- **100% estática**: se puede alojar en cualquier CDN, no requiere servidor de aplicaciones.
-- **Sin base de datos**: el "catálogo" de radios es un JSON versionado en el repo.
+- **100% estática**: se aloja en cualquier CDN, no requiere servidor de aplicaciones.
+- **Sin base de datos**: el "catálogo" de radios es un JSON versionado en el repo, importado en build time (el navegador nunca lo descarga por separado).
 - **Streaming directo**: el navegador reproduce los streams vía el elemento `<audio>` nativo; la app nunca toca los bytes de audio.
+- **PWA**: instalable, con controles de reproducción en pantalla de bloque.
 
 ## 🧰 Stack y decisiones técnicas
 
 | Decisión | Alternativa descartada | Motivo |
 |---|---|---|
-| JavaScript vanilla sin framework | React / Vue / Svelte | La UI tiene 4 elementos interactivos; un framework agregaría peso de runtime sin beneficio real. |
-| Vite como bundler | Webpack, CRA | Configuración cero, dev server rápido y build optimizado por defecto. |
-| `radios.json` en `/public` | Constante en el JS | Desacopla el catálogo del código: se agregan radios sin tocar la lógica. |
-| Elemento `<audio>` nativo | Librerías de player (HLS.js, Howler) | Los streams usados son AAC/MP3/ICEcast, reproducibles nativamente; HLS.js solo sería necesario si se adoptaran streams HLS con manifiesto `.m3u8`. |
+| Astro para el shell estático | SPA (React/Vue "bare") | La página es contenido estático: Astro la genera en build time con SEO perfecto y cero JS innecesario. |
+| Isla de React solo para el player | Todo el sitio en React | El único componente con estado real es el reproductor. `client:load` hidrata solo esa pieza; el resto es HTML puro. |
+| Radios importadas en build time (`import radios from '../data/radios.json'`) | `fetch` en runtime | Cero requests, cero flash de contenido vacío. Agregar una radio = editar JSON + push (el deploy reconstruye). |
+| Eventos del `<audio>` como fuente de verdad | Estado invertido a mano (`isPlaying = !isPlaying`) | Elimina bugs de estados desincronizados (ej.: doble click necesario para reproducir). |
+| Elemento `<audio>` nativo | Librerías de player (HLS.js, Howler) | Los streams usados son AAC/MP3/ICEcast, reproducibles nativamente; HLS.js solo sería necesario con manifiestos `.m3u8`. |
+| SVG inline para íconos | PNGs (`play.png`, `pause.png`) | Se recolorean con CSS, escalan sin blur y ahorran 2 requests. |
+| Workbox (vía `@vite-pwa/astro`) en modo `generateSW` | Service worker escrito a mano | Configuración declarativa, precache automático del app shell con hash de versiones. |
 | Netlify | Vercel, GitHub Pages | Deploy automático desde `main`, dominio propio, SSL y CDN global sin costo. |
+| Vite (directo) | — | Reemplazado por Astro 5, que internamente usa Vite y además resuelve el render estático y las islas. |
 
 ## 📂 Estructura del proyecto
 
 ```
 radios-argentinas/
-├── public/                  # Archivos servidos tal cual, sin procesar
-│   ├── radios.json          # Catálogo de radios (única fuente de verdad)
-│   └── mic.png              # Favicon
+├── public/                  # Archivos servidos tal cual (sin procesar)
+│   ├── favicon.svg          # Favicon vectorial
+│   └── icons/               # Íconos PWA (192/512) y apple-touch-icon
 ├── src/
-│   ├── index.js             # Toda la lógica: carga de radios, player, fecha
-│   ├── style.css            # Estilos globales
-│   └── assets/images/       # Íconos play/pause y fondo (bandera argentina)
-├── index.html               # Página única (shell de la aplicación)
-├── netlify.toml             # Configuración de build para Netlify
+│   ├── data/radios.json     # Catálogo: única fuente de verdad de emisoras
+│   ├── hooks/
+│   │   ├── useAudio.js      # Máquina de estados + elemento <audio>
+│   │   └── useMediaSession.js  # Controles del sistema operativo
+│   ├── components/          # Isla de React
+│   │   ├── Player.jsx       # Orquestador (estado, persistencia, datos)
+│   │   ├── PlayButton.jsx   # Botón central (SVG: play/pause/spinner)
+│   │   ├── VolumeSlider.jsx # Volumen con % visible
+│   │   └── RadioSelector.jsx# <select> de emisoras
+│   ├── layouts/BaseLayout.astro  # <head> (SEO/OG/PWA), footer, fecha
+│   ├── pages/index.astro    # Página única, HTML estático
+│   └── styles/global.css    # Variables, fondo, reproductor, footer
+├── astro.config.mjs         # Integraciones: react + PWA (manifest, SW)
+├── netlify.toml             # command + publish para Netlify
 ├── ARCHITECTURE.md          # Este documento
-└── package.json             # Scripts y dependencias de desarrollo
+└── package.json
 ```
 
 ### Responsabilidades por archivo
 
 | Archivo | Responsabilidad |
 |---|---|
-| `index.html` | Estructura semántica: reproductor (botón, volumen, selector) y footer. |
-| `src/index.js` | 1) Cargar `radios.json` y poblar el `<select>`. 2) Gestionar reproducción, volumen y cambios de radio. 3) Mostrar la fecha actual. |
-| `src/style.css` | Fondo con overlay, estilos del selector, footer y estados hover. |
-| `public/radios.json` | Catálogo de emisoras: `key`, `name`, `url`. |
+| `src/pages/index.astro` | Genera el HTML estático; importa el catálogo y lo pasa como prop a la isla. |
+| `src/layouts/BaseLayout.astro` | SEO, Open Graph, favicon, manifest, registro del SW, footer y fecha actual. |
+| `src/components/Player.jsx` | Orquesta la isla: sincroniza estado, restaura/guarda preferencias, arma el mensaje de estado. |
+| `src/hooks/useAudio.js` | Ciclo de vida del `<audio>` y estados `idle/loading/playing/paused/error` derivados de eventos reales. |
+| `src/hooks/useMediaSession.js` | Metadatos y handlers play/pause para la pantalla de bloque y auriculares. |
+| `src/data/radios.json` | Catálogo de emisoras: `key`, `name`, `url`. |
+| `astro.config.mjs` | Integración React y configuración completa de la PWA (manifest + workbox). |
 
 ## 🔄 Flujo de datos
 
 ```mermaid
 sequenceDiagram
-    participant U as Usuario
-    participant JS as src/index.js
-    participant CDN as Netlify (estático)
+    participant Build as Build (Netlify)
+    participant B as Navegador
+    participant R as Isla React (Player)
     participant ST as Stream de la radio
 
-    U->>JS: Carga de la página
-    JS->>CDN: GET /radios.json
-    CDN-->>JS: Array de radios
-    JS->>U: Popula el <select> con las emisoras
-    U->>JS: Elige una radio
-    U->>JS: Click en play
-    JS->>ST: audioElement.play() contra la URL del stream
-    ST-->>JS: Stream de audio en vivo (continuo)
-    U->>JS: Ajusta volumen / cambia de radio / pausa
+    Build->>Build: import radios.json (build time)
+    Build->>B: HTML estático con <Player radios=[...]>
+
+    Note over B: El navegador NO fetcha radios.json
+
+    B->>R: Hidratación (client:load)
+    R->>R: localStorage → restaura radio y volumen
+    U->>R: Elige radio + click en play
+    R->>ST: audio.play() contra la URL del stream
+    ST-->>R: Stream en vivo (continuo)
+    R-->>B: 'playing' event → estado = playing
+    R->>B: MediaSession → controles en lock screen
 ```
 
 **Puntos clave:**
 
-- La lista de radios se carga **una vez** al iniciar (sin caché adicional; es un archivo de ~2 KB).
+- El catálogo **viaja embebido** en el HTML: la isla lo recibe como prop serializada.
 - El audio **nunca pasa por la app**: el `<audio>` se conecta directo al CDN de la radio, así que el consumo de ancho de banda del sitio es despreciable.
 - Cambiar de radio solo reasigna `src` del `<audio>`; no hay peticiones intermedias.
+- Preferencias (`ra:radio`, `ra:volume` en `localStorage`) se restauran post-hidratación para evitar mismatches con el HTML server-rendered.
 
 ## 🎛️ Máquina de estados del reproductor
 
-El reproductor tiene un estado simple con dos valores (`isPlaying`):
+El hook `useAudio` deriva el estado de los **eventos reales** del elemento `<audio>`:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Pausa : carga inicial
-    Pausa --> Reproduciendo : click en play (con radio elegida)
-    Reproduciendo --> Pausa : click en pausa
-    Reproduciendo --> Pausa : error en el stream
-    Pausa --> Pausa : cambio de radio (queda esperando play)
+    [*] --> Idle : carga inicial
+    Idle --> Loading : play (con radio elegida)
+    Loading --> Playing : evento 'playing'
+    Playing --> Loading : evento 'waiting' (buffering)
+    Playing --> Paused : pause() del usuario
+    Loading --> Error : excepción en play()
+    Error --> Idle : click en play (reintenta)
+    Paused --> Loading : play (misma u otra radio)
 ```
 
-**Reglas del estado:**
+**Reglas:**
 
-- Si no hay radio seleccionada, el botón play **no** altera el estado (evita el bug de doble click).
-- Al cambiar de radio estando en reproducción, la nueva emisora **arranca automáticamente**.
-- Si el stream falla (radio caída, corte de red), el reproductor vuelve a pausa y lo registra en consola.
+- Sin radio elegida el botón está **deshabilitado** (no existe el "estado invertido sin nada sonando").
+- `loading` es explícito: el botón muestra un **spinner** mientras conecta.
+- Si el stream falla, el estado pasa a `error`, el botón se pinta con borde rojo y la línea de estado avisa; `click` reintenta.
+- El `service worker` no interfiere con los streams: son cross-origin y Workbox solo maneja sus rutas registradas.
+
+## 📡 Arquitectura PWA
+
+Configurada íntegramente en [`astro.config.mjs`](astro.config.mjs) vía `@vite-pwa/astro`:
+
+| Pieza | Archivo | Rol |
+|---|---|---|
+| Manifest | `dist/manifest.webmanifest` (generado) | Nombre, íconos, colores, `display: standalone` → instalable |
+| Service Worker | `dist/sw.js` (generado, modo `generateSW`) | Precache del app shell: la UI carga incluso sin conexión |
+| Registro | `dist/registerSW.js` (referenciado en `BaseLayout`) | `autoUpdate`: la próxima visita toma la versión nueva |
+| Íconos | `public/icons/icon-{192,512}.png` | Instalación en Android/desktop; `apple-touch-icon` para iOS |
+| Media Session | `useMediaSession.js` | Controles y metadatos en la pantalla de bloque |
+
+**Qué se cachea y qué no:**
+
+- ✅ Precache: HTML, CSS, JS, SVG, PNG, WebP del app shell (~259 KB).
+- ❌ Streams de radio: en vivo y cross-origin, pasan directo a la red (Workbox solo intercepta sus rutas registradas).
+- ℹ️ La lista de radios no se cachea por separado: va embebida en el HTML, que sí está precacheado.
+
+> **Nota de implementación:** `@vite-pwa/astro` genera `manifest.webmanifest` y `registerSW.js` pero no los inyecta en el HTML producido por Astro; por eso `BaseLayout.astro` los referencia manualmente (`<link rel="manifest">` + `<script src="/registerSW.js">`).
 
 ## 🚢 Pipeline de deploy
 
@@ -123,7 +171,7 @@ stateDiagram-v2
 flowchart LR
     A[git push a main] --> B[Netlify detecta el push]
     B --> C[npm install]
-    C --> D[npm run build - Vite]
+    C --> D[npm run build - Astro]
     D --> E[Publica dist/ en CDN]
     E --> F[radiosarg.netlify.app]
 ```
@@ -131,13 +179,10 @@ flowchart LR
 - Configuración: [`netlify.toml`](netlify.toml) define `command` y `publish`.
 - Cada push a `main` genera un deploy; los Pull Requests generan previews automáticos.
 
-## 🧭 Evolución planificada
+## 📜 Historial de arquitectura
 
-El proyecto está en proceso de migración hacia **Astro 5 + isla de React**. El objetivo de la nueva arquitectura:
-
-- **Astro** para el shell estático (SEO, carga instantánea, HTML en el servidor de build).
-- **Isla de React** para el reproductor: el único componente interactivo, hidratado con `client:load`.
-- **PWA completa**: instalable en el celular, service worker para la UI offline y **Media Session API** para controles de reproducción en la pantalla de bloque.
-- **Assets optimizados**: íconos SVG inline (en lugar de PNG), fondo en WebP, slider de volumen con estilos propios y diseño responsive del footer.
-
-Los detalles de la arquitectura objetivo se documentan en la sección *Migración a Astro* una vez completada la Fase 2.
+| Versión | Stack | Cambios |
+|---|---|---|
+| v1 | HTML + CSS + JS vanilla, Vite, Netlify | App funcional básica. Bugs de estado en el player, sin SEO, deploy mal configurado. |
+| v1.5 | v1 + fixes | Estado del player corregido, meta tags, `netlify.toml` arreglado, JSDoc completo. Ver commit `fix:` en el historial. |
+| **v2 (actual)** | **Astro 5 + isla de React + PWA** | Render estático con SEO, máquina de estados por eventos, catálogo en build time, PWA instalable con Media Session, assets optimizados (SVG, WebP, -67% de peso del fondo). |

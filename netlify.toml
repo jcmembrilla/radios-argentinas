@@ -1,4 +1,4 @@
 # Configuración de build para Netlify
 [build]
-  command = "npm run build"   # genera la versión de producción con Vite
+  command = "npm run build"   # genera la versión de producción con Astro
   publish = "dist"            # carpeta que Netlify publica
