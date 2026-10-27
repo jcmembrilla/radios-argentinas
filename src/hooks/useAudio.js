@@ -14,6 +14,10 @@
  *    playing → sonando
  *    paused  → en pausa con radio cargada
  *    error   → el stream falló (radio caída o red)
+ *
+ *  HLS: los streams .m3u8 no los reproduce el <audio> nativo (salvo
+ *  Safari) — hls.js se importa EN DIFERIDO solo cuando se elige una
+ *  emisora HLS; los directos (AAC/MP3) van pelados al elemento.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -46,8 +50,18 @@ export function useAudio() {
    * con la nueva emisora. Es el modelo de una radio de verdad.
    */
   const wantPlayingRef = useRef(false);
+  /** Instancia activa de hls.js (solo mientras suena una emisora HLS). */
+  const hlsRef = useRef(null);
   const [state, setState] = useState(PLAYER_STATE.IDLE);
   const [volume, setVolumeState] = useState(1);
+
+  /** Libera la instancia de hls.js (si no se destruye, fuga memoria). */
+  const cleanupHls = useCallback(() => {
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     const audio = new Audio();
@@ -75,6 +89,10 @@ export function useAudio() {
       audio.removeEventListener('waiting', onWaiting);
       audio.removeEventListener('error', onError);
       audio.pause();
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
       audioRef.current = null;
     };
   }, []);
@@ -84,6 +102,10 @@ export function useAudio() {
    * Si el navegador bloquea el autoplay o el stream no responde, el estado
    * queda en `error` para que la UI lo refleje (la intención sigue ON:
    * si el usuario cambia de radio, se reintenta solo).
+   *
+   * HLS (.m3u8): Safari lo reproduce nativo; en el resto se usa hls.js
+   * importado EN DIFERIDO — el chunk solo se descarga al elegir una
+   * emisora HLS, el resto del catálogo no lo baja jamás.
    * @param {string} url - URL del stream (debe venir trimmeada).
    */
   const play = useCallback(async (url) => {
@@ -91,15 +113,41 @@ export function useAudio() {
     if (!audio || !url) return;
 
     wantPlayingRef.current = true;
-    if (audio.src !== url) audio.src = url;
     setState(PLAYER_STATE.LOADING);
+
+    if (url.includes('.m3u8') && !audio.canPlayType('application/vnd.apple.mpegurl')) {
+      const { default: Hls } = await import('hls.js');
+      // Si mientras bajaba el chunk el usuario cortó o cambió de radio,
+      // no montar una instancia que nadie va a usar.
+      if (!wantPlayingRef.current) return;
+      cleanupHls();
+      const hls = new Hls();
+      hlsRef.current = hls;
+      hls.on(Hls.Events.ERROR, (_evt, data) => {
+        // Solo los errores fatales cortan la reproducción; los
+        // recuperables (picos de red) los resuelve hls.js solo.
+        if (data.fatal && wantPlayingRef.current) {
+          cleanupHls();
+          setState(PLAYER_STATE.ERROR);
+        }
+      });
+      hls.loadSource(url);
+      hls.attachAudio(audio);
+      audio.play().catch(() => {
+        if (wantPlayingRef.current) setState(PLAYER_STATE.ERROR);
+      });
+      return; // el evento 'playing' confirma la reproducción real
+    }
+
+    cleanupHls();
+    if (audio.src !== url) audio.src = url;
     try {
       await audio.play();
       // El evento 'playing' confirma la reproducción real
     } catch {
       setState(PLAYER_STATE.ERROR);
     }
-  }, []);
+  }, [cleanupHls]);
 
   /** Pausa el stream, marca la intención como apagada y refleja el estado. */
   const pause = useCallback(() => {
@@ -107,6 +155,9 @@ export function useAudio() {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
+    // HLS: dejar de bajar segmentos mientras está en pausa (red/batería);
+    // play() reconstruye la instancia al reanudar.
+    if (hlsRef.current) hlsRef.current.stopLoad();
     setState(PLAYER_STATE.PAUSED);
   }, []);
 
