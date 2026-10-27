@@ -25,17 +25,29 @@ const STORAGE_KEYS = {
   volume: 'ra:volume',
 };
 
-/** Mensaje de estado según el estado del player y la radio elegida. */
-function statusMessage(state, radioName) {
+/** Contenido de la línea de estado según el estado del player y la radio elegida. */
+function statusContent(state, radioName) {
   switch (state) {
     case PLAYER_STATE.PLAYING:
-      return `Escuchando ${radioName}`;
+      return (
+        <>
+          Escuchando <span className="text-celeste">{radioName}</span>
+        </>
+      );
     case PLAYER_STATE.LOADING:
-      return `Conectando con ${radioName}…`;
+      return (
+        <>
+          Conectando con <span className="text-celeste">{radioName}</span>…
+        </>
+      );
     case PLAYER_STATE.PAUSED:
       return 'En pausa';
     case PLAYER_STATE.ERROR:
-      return `No se pudo conectar con ${radioName}`;
+      return (
+        <>
+          No se pudo conectar con <span className="text-celeste">{radioName}</span>
+        </>
+      );
     default:
       return 'Elegí una radio para empezar';
   }
@@ -118,7 +130,7 @@ export default function Player({ radios }) {
 
       {/* Estado para lectores de pantalla y feedback visual */}
       <p className="min-h-6 text-[0.95rem] text-white/70" role="status" aria-live="polite">
-        {statusMessage(state, selectedRadio?.name ?? '')}
+        {statusContent(state, selectedRadio?.name ?? '')}
       </p>
     </div>
   );

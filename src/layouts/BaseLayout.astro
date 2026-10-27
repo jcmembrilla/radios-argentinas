@@ -57,19 +57,17 @@ const {
     <title>{title}</title>
   </head>
 
-  <!-- bg-flag: utilidad custom (bandera + overlay).
+  <!-- bg-app: utilidad custom (base azul-negra + glow radial celeste).
        El body es columna flex: main crece (flex-1) y el footer queda abajo. -->
-  <body class="bg-flag flex min-h-svh flex-col font-sans antialiased text-fg">
+  <body class="bg-app flex min-h-svh flex-col font-sans antialiased text-fg">
     <slot />
 
-    <footer class="flex flex-col items-center gap-1 px-4 pt-6 pb-8 text-center">
+    <footer class="flex flex-col items-center gap-2 px-4 pt-6 pb-8 text-center">
       <!-- Almanaque: fecha + clima automático (por IP, sin prompts).
            client:idle: se hidrata cuando el navegador está libre,
            después del player que es lo crítico. -->
       <Almanac client:idle />
-      <p class="text-[0.9rem] text-white/70">
-        Una aplicación pensada para ser práctica y sencilla
-      </p>
+      <p class="text-[0.8rem] text-white/40">Siempre a tu alcance</p>
     </footer>
   </body>
 </html>

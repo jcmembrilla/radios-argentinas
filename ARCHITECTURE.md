@@ -40,6 +40,8 @@ Radios Argentinas es una **aplicación web estática de una sola página** para 
 - **Sin base de datos**: el "catálogo" de radios es un JSON versionado en el repo, importado en build time (el navegador nunca lo descarga por separado).
 - **Streaming directo**: el navegador reproduce los streams vía el elemento `<audio>` nativo; la app nunca toca los bytes de audio.
 - **PWA**: instalable, con controles de reproducción en pantalla de bloque.
+- **Almanaque**: fecha + clima automático sin prompts (IP → Open-Meteo), con degradación silenciosa.
+- **Dark mode único**: sin imágenes de fondo; la identidad se construye con tipografía, glow celeste y glass sutil.
 
 ## 🧰 Stack y decisiones técnicas
 
@@ -56,7 +58,7 @@ Radios Argentinas es una **aplicación web estática de una sola página** para 
 | Vite (directo) | — | Reemplazado por Astro 5, que internamente usa Vite y además resuelve el render estático y las islas. |
 | Tailwind v4 (`@tailwindcss/vite`) | CSS plano con clases BEM | Estilos co-localizados en cada componente, tokens centralizados en `@theme`, CSS final tree-shakeado (12.6 KB con todo el sitio). La integración `@astrojs/tailwind` está deprecada: v4 se integra como plugin de Vite. |
 | Clima: Open-Meteo + ubicación por IP (ipwho.is) | API con key / GPS del navegador | Sin backend no hay dónde guardar una API key de forma segura (quedaría expuesta en el cliente); el GPS nativo **siempre** muestra un prompt de permiso. Ambos servicios son gratis, sin key y con HTTPS. |
-| Capa custom mínima en `global.css` | Todo en utilidades | Solo lo no expresable: fondo con imagen + overlay (`bg-flag`), flecha del select (`select-arrow`) y pseudo-elementos del slider (`.range-field`). |
+| Capa custom mínima en `global.css` | Todo en utilidades | Solo lo no expresable: fondo con glow radial (`bg-app`), flecha del select (`select-arrow`) y pseudo-elementos del slider (`.range-field`). |
 
 ## 📂 Estructura del proyecto
 
@@ -98,7 +100,7 @@ radios-argentinas/
 | `src/hooks/useMediaSession.js` | Metadatos y handlers play/pause para la pantalla de bloque y auriculares. |
 | `src/hooks/useAlmanac.js` | Fecha local + clima: cache 30 min → ipwho.is (coordenadas por IP) → Open-Meteo (clima). Falla silenciosa: sin datos muestra solo la fecha. |
 | `src/data/radios.json` | Catálogo de emisoras: `key`, `name`, `url`. |
-| `src/styles/global.css` | Tokens Tailwind (`@theme`), foco de teclado global y utilidades custom (`bg-flag`, `select-arrow`, thumb del slider). |
+| `src/styles/global.css` | Tokens Tailwind (`@theme`), `color-scheme: dark`, foco de teclado global y utilidades custom (`bg-app`, `select-arrow`, thumb del slider). |
 | `astro.config.mjs` | Integraciones React/PWA y plugin de Vite de Tailwind. |
 
 ## 🔄 Flujo de datos
@@ -168,7 +170,7 @@ Configurada íntegramente en [`astro.config.mjs`](astro.config.mjs) vía `@vite-
 
 **Qué se cachea y qué no:**
 
-- ✅ Precache: HTML, CSS, JS, SVG, PNG, WebP del app shell (~259 KB).
+- ✅ Precache: HTML, CSS, JS, SVG, PNG del app shell (~286 KB).
 - ❌ Streams de radio: en vivo y cross-origin, pasan directo a la red (Workbox solo intercepta sus rutas registradas).
 - ℹ️ La lista de radios no se cachea por separado: va embebida en el HTML, que sí está precacheado.
 
@@ -225,5 +227,6 @@ flowchart LR
 |---|---|---|
 | v1 | HTML + CSS + JS vanilla, Vite, Netlify | App funcional básica. Bugs de estado en el player, sin SEO, deploy mal configurado. |
 | v1.5 | v1 + fixes | Estado del player corregido, meta tags, `netlify.toml` arreglado, JSDoc completo. Ver commit `fix:` en el historial. |
-| v2 (actual) | Astro 5 + isla de React + PWA | Render estático con SEO, máquina de estados por eventos, catálogo en build time, PWA instalable con Media Session, assets optimizados (SVG, WebP, -67% de peso del fondo). |
-| v2.1 | + Tailwind v4 | Migración completa de estilos a utilidades: tokens en `@theme`, capa custom reducida a lo no expresable (fondo, flecha del select, thumb del slider). CSS final tree-shakeado: 12.6 KB. |
+| v2 | Astro 5 + isla de React + PWA | Render estático con SEO, máquina de estados por eventos, catálogo en build time, PWA instalable con Media Session, assets optimizados (SVG inline). |
+| v2.1 | + Tailwind v4 | Migración completa de estilos a utilidades: tokens en `@theme`, capa custom reducida a lo no expresable (fondo, flecha del select, thumb del slider). CSS final tree-shakeado. |
+| **v3 (actual)** | + Almanaque + UI dark celeste | Almanaque de fecha y clima automático (IP → Open-Meteo, sin prompts, cache 30 min). Rediseño: dark mode único con glow radial celeste, slider con relleno dinámico, select glass oscuro (`color-scheme: dark`), sin imágenes de fondo (se elimina el WebP, precache -30%). |

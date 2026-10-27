@@ -20,11 +20,24 @@ import radios from '../data/radios.json';
 <BaseLayout>
   <!-- flex-1: ocupa el alto restante del body y centra el reproductor -->
   <main
-    class="flex flex-1 flex-col items-center justify-center gap-10 px-4 py-10 text-center"
+    class="flex flex-1 flex-col items-center justify-center gap-9 px-4 py-10 text-center"
   >
-    <h1 class="text-[clamp(1.75rem,5vw,2.75rem)] tracking-[0.02em]">
-      Radios Argentinas
-    </h1>
+    <!-- Título: dos líneas, tracking amplio + acento celeste mínimo -->
+    <div class="flex flex-col items-center gap-4">
+      <h1
+        class="flex flex-col items-center gap-1 text-[clamp(1.6rem,5vw,2.6rem)] font-light tracking-[0.4em] uppercase"
+      >
+        <span class="-mr-[0.4em]">Radios</span>
+        <span class="-mr-[0.4em]">Argentinas</span>
+      </h1>
+      <!-- Acento: línea · punto · línea -->
+      <div class="flex items-center gap-2" aria-hidden="true">
+        <span class="h-px w-10 bg-celeste/50"></span>
+        <span class="size-1.5 rounded-full bg-celeste"></span>
+        <span class="h-px w-10 bg-celeste/50"></span>
+      </div>
+    </div>
+
     <Player client:load radios={radios} />
   </main>
 </BaseLayout>

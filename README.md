@@ -18,6 +18,7 @@ La aplicación está disponible en producción: **[radiosarg.netlify.app](https:
 - ▶️ **Reproductor confiable**: máquina de estados basada en eventos reales del audio, con spinner de conexión y avisos de error si una radio cae.
 - 📱 **PWA instalable**: agregala a la pantalla de inicio de tu celular y controlá la reproducción desde la pantalla de bloque (Media Session API).
 - 🌤️ **Almanaque**: fecha del día y clima actual (temperatura + condición) según tu ubicación, detectado automáticamente sin pedir permisos.
+- 🌙 **Dark mode único**: interfaz minimalista con glow celeste, sin imágenes de fondo.
 - 💾 **Preferencias recordadas**: guarda tu radio y tu volumen para la próxima visita.
 - 📡 **Catálogo desacoplado**: la lista de radios vive en un JSON editable, sin tocar el código.
 - ⚡ **Rápida**: HTML estático renderizado con Astro; solo el reproductor se hidrata como isla de React.
