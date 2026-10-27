@@ -99,7 +99,7 @@ radios-argentinas/
 | `src/hooks/useAudio.js` | Ciclo de vida del `<audio>` y estados `idle/loading/playing/paused/error` derivados de eventos reales. |
 | `src/hooks/useMediaSession.js` | Metadatos y handlers play/pause para la pantalla de bloque y auriculares. |
 | `src/hooks/useAlmanac.js` | Fecha local + clima: cache 30 min → ipwho.is (coordenadas por IP) → Open-Meteo (clima). Falla silenciosa: sin datos muestra solo la fecha. |
-| `src/data/radios.json` | Catálogo de emisoras: `key`, `name`, `url`. |
+| `src/data/radios.json` | Catálogo de emisoras: `id`, `name`, `dial`, `location`, `genre`, `streamUrl`, `homepage`. |
 | `src/styles/global.css` | Tokens Tailwind (`@theme`), `color-scheme: dark`, foco de teclado global y utilidades custom (`bg-app`, `select-arrow`, thumb del slider). |
 | `astro.config.mjs` | Integraciones React/PWA y plugin de Vite de Tailwind. |
 
@@ -156,6 +156,7 @@ stateDiagram-v2
 - Si el stream falla, el estado pasa a `error`, el botón se pinta con borde rojo y la línea de estado avisa; `click` reintenta.
 - **Intención vs realidad**: `useAudio` mantiene `wantPlayingRef` (la radio "prendida/apagada") separado del estado real. `select(url)` — el método que usa el selector al cambiar de emisora — honra la intención: si estaba prendida, la nueva emisora arranca sola (girar el dial no pausa, cambia). Si el stream estaba en error y se cambia de radio, se reintenta solo.
 - **Dial = sintonía, botón = encendido**: el dial del botón refleja la emisora elegida (posición proporcional en la escala; marca dorada de OFF cuando no hay emisora) y solo gira cuando cambia el selector — un cambio real de radio. El ícono muestra el estado real: ⏸ mientras suena, ▶ en pausa o apagado. Pausar no re-sintoniza; prender no re-sintoniza.
+- **HLS (streams `.m3u8`)**: el `<audio>` nativo no los reproduce (salvo Safari). `useAudio` importa **hls.js en diferido** (`await import('hls.js')`) solo al elegir una emisora HLS — el resto del catálogo jamás descarga el chunk. Errores fatales de hls.js van al estado `error` (los recuperables los resuelve la librería); al pausar se corta la descarga de segmentos (`stopLoad`) y al cambiar de emisora o desmontar se destruye la instancia (si no, fuga de memoria).
 - El `service worker` no interfiere con los streams: son cross-origin y Workbox solo maneja sus rutas registradas.
 
 ## 📡 Arquitectura PWA

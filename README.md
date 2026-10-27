@@ -102,15 +102,25 @@ La lista de emisoras vive en [`src/data/radios.json`](src/data/radios.json). Par
 
 ```json
 {
-  "key": 13,
-  "name": "Nombre de la radio",
-  "url": "https://servidor.com/stream.aac"
+  "id": "mega-983",
+  "name": "Mega 98.3",
+  "dial": "98.3 FM",
+  "location": "Buenos Aires",
+  "genre": "Rock Nacional",
+  "streamUrl": "https://mega.stweb.tv/mega983/live/playlist.m3u8",
+  "homepage": "https://www.radiomega.fm/"
 }
 ```
 
-- **`key`**: identificador numérico único, correlativo.
+- **`id`**: identificador único (slug en kebab-case). Lo usa React como `key`.
 - **`name`**: nombre visible en el selector.
-- **`url`**: URL directa del stream (formatos soportados por el navegador: MP3, AAC, ICEcast, HLS). Sin espacios al inicio o al final.
+- **`dial`**: frecuencia o amplitud (ej. `98.3 FM`, `630 AM`). Se muestra junto al nombre en el selector (`Nombre · dial`). Si la emisora no tiene dial conocido, dejalo vacío y el selector muestra solo el nombre.
+- **`location`**: ciudad o zona de la emisora (hoy solo documental, reservado para futuro uso en la UI).
+- **`genre`**: género o tipo de contenido. Aparece como sub-línea bajo el mensaje de estado cuando hay emisora elegida; vacío = no se muestra nada.
+- **`streamUrl`**: URL directa del stream, sin espacios. Formatos: MP3, AAC, ICEcast (los reproduce el `<audio>` nativo) o **HLS** (`.m3u8` — en Chrome/Firefox se resuelve con hls.js cargado en diferido; Safari lo reproduce nativo). Ojo: evitá streams por `http://` — el sitio es HTTPS y el navegador los bloquea (mixed content).
+- **`homepage`**: web oficial de la emisora (hoy solo documental).
+
+> **Antes de agregar una URL, verificá que viva**: probála con `curl -I` (esperá un `200`/`302` con `content-type` de audio, o `application/vnd.apple.mpegurl` para HLS). Muchos streams de radios argentinas cambian de servidor sin aviso.
 
 La lista se importa en build time, así que al hacer push el deploy automático de Netlify reconstruye el sitio y publica la nueva radio.
 
