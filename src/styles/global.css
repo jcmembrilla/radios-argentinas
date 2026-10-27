@@ -25,6 +25,9 @@
   --color-celeste: #74acdf;
   --color-celeste-soft: #a8cbea;
 
+  /* Dorado del Sol de Mayo (acento del título) */
+  --color-sol: #f6b40e;
+
   /* Errores: borde del botón cuando el stream falla */
   --color-danger: #e5484d;
 
