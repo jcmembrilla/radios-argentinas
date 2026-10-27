@@ -155,6 +155,7 @@ stateDiagram-v2
 - `loading` es explícito: el botón muestra un **spinner** mientras conecta.
 - Si el stream falla, el estado pasa a `error`, el botón se pinta con borde rojo y la línea de estado avisa; `click` reintenta.
 - **Intención vs realidad**: `useAudio` mantiene `wantPlayingRef` (la radio "prendida/apagada") separado del estado real. `select(url)` — el método que usa el selector al cambiar de emisora — honra la intención: si estaba prendida, la nueva emisora arranca sola (girar el dial no pausa, cambia). Si el stream estaba en error y se cambia de radio, se reintenta solo.
+- **Dial = sintonía, botón = encendido**: el dial del botón refleja la emisora elegida (posición proporcional en la escala; marca dorada de OFF cuando no hay emisora) y solo gira cuando cambia el selector — un cambio real de radio. El ícono muestra el estado real: ⏸ mientras suena, ▶ en pausa o apagado. Pausar no re-sintoniza; prender no re-sintoniza.
 - El `service worker` no interfiere con los streams: son cross-origin y Workbox solo maneja sus rutas registradas.
 
 ## 📡 Arquitectura PWA
