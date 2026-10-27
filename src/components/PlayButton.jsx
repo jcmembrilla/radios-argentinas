@@ -1,27 +1,32 @@
 /**
- * PlayButton — botón perilla de radio con dial de detents.
+ * PlayButton — botón de encendido con dial de sintonía.
  *
- * Comportamiento de "modo radio":
- *  - ▶ solo en idle/error (pide una acción al usuario).
- *  - Una vez elegida la emisora, ⏸ se mantiene esté sonando o en pausa:
- *    el botón indica que la radio está "prendida", y el mismo click
- *    alterna (como una perilla en ON).
+ * Modelo de una radio real: el dial y el botón son cosas distintas.
+ *  - El BOTÓN es el encendido: solo alterna play/pausa. Su ícono
+ *    refleja el estado real — ⏸ mientras suena, ▶ pausado o apagado.
+ *  - El DIAL es la sintonía: cada emisora tiene su lugar en la escala
+ *    (360° / n emisoras) y solo gira cuando cambia el selector — ahí
+ *    hay un cambio real de radio. Sin cambio de selector, quieto.
  *
  * El dial (CSS puro, sin librerías):
- *  - Anillo de ticks (detents): círculo SVG punteado que rota 30° por
- *    press — los ticks "encastran" en la próxima posición.
- *  - Aguja (muesca celeste): gira 180° por press, como un selector.
+ *  - Escala graduada que rota: ticks finos (cada 10°) + ticks de
+ *    emisora (cada 30°) + marca dorada en la posición OFF.
+ *  - Aguja lectora FIJA arriba (punto glow): la escala pasa por
+ *    debajo, como en un dial real.
+ *  - La marca dorada es clave: un anillo uniforme rotado un múltiplo
+ *    de su período es indistinguible; el acento hace visible todo
+ *    giro, por chico que sea. Queda a medio paso antes de la emisora 1:
+ *    al apagarse, el dial "descansa" en OFF con la marca bajo la aguja.
  *  - Overshoot mecánico: cubic-bezier con rebote al asentar (700ms).
  *  - motion-reduce: sin transiciones.
  *
  * Estados visuales:
- *  - playing  → ⏸ visible + dial girando por press
- *  - paused   → ⏸ visible (modo radio en pausa)
+ *  - playing  → ⏸
+ *  - paused   → ▶ (reanudar)
  *  - loading  → spinner (conectando al stream)
- *  - error    → ▶ + dial rojo (reintentar)
- *  - default  → ▶
+ *  - error    → ▶ + escala roja (reintentar)
+ *  - idle     → ▶ (sin emisora; dial en OFF, botón deshabilitado)
  */
-import { useState } from 'react';
 import { PLAYER_STATE } from '../hooks/useAudio.js';
 
 /** Gradiente de los iconos (blanco arriba → celeste abajo), por-svg (ids únicos). */
@@ -37,17 +42,27 @@ const GRADIENT_DEFS = (id) => (
 /** Easing con rebote: pasa de largo y vuelve a asentar (efecto "clic"). */
 const DIAL_TIMING = 'duration-700 ease-[cubic-bezier(.34,1.56,.64,1)]';
 
-export default function PlayButton({ state, onToggle, disabled }) {
+export default function PlayButton({
+  state,
+  onToggle,
+  disabled,
+  stationIndex = -1,
+  stationCount = 1,
+}) {
   const isPlaying = state === PLAYER_STATE.PLAYING;
   const isLoading = state === PLAYER_STATE.LOADING;
   const isError = state === PLAYER_STATE.ERROR;
 
-  // Modo radio: emisora elegida y el botón en ON (sonando o pausado)
-  const inRadioMode = isPlaying || state === PLAYER_STATE.PAUSED;
+  // --- Sintonía: el ángulo SE DERIVA de la emisora elegida ----------------
+  // Girar la escala trae la posición de la emisora bajo la aguja fija.
+  // Sin emisora → OFF (marca dorada bajo la aguja, medio paso antes de
+  // la emisora 1). Al restaurar la sesión, el render inicial va directo
+  // al ángulo final: el dial aparece ya sintonizado, sin animación fake.
+  const step = 360 / Math.max(stationCount, 1);
+  const dialAngle = stationIndex >= 0 ? -step * stationIndex : step / 2;
 
-  // Dial: 12 detents → el anillo avanza 30° por press; la aguja gira 180°
-  const [dialAngle, setDialAngle] = useState(0);
-  const [needleAngle, setNeedleAngle] = useState(0);
+  // Ícono = estado real: ⏸ solo mientras suena
+  const showPause = isPlaying;
 
   // La etiqueta describe la ACCIÓN del click; el ícono, el modo actual
   const label = isPlaying
@@ -71,42 +86,57 @@ export default function PlayButton({ state, onToggle, disabled }) {
         'disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none',
         'max-[480px]:size-28',
       ].join(' ')}
-      onClick={() => {
-        setDialAngle((a) => a + 30);
-        setNeedleAngle((a) => a + 180);
-        onToggle();
-      }}
+      onClick={onToggle}
       disabled={disabled}
       aria-label={label}
       title={label}
     >
-      {/* Anillo de detents: círculo punteado (12 ticks), rota 30° por press */}
+      {/* Escala del dial: rota hasta traer la emisora bajo la aguja */}
       <span
         aria-hidden="true"
         className={`absolute inset-0 transition-transform ${DIAL_TIMING} motion-reduce:transition-none`}
         style={{ transform: `rotate(${dialAngle}deg)` }}
       >
         <svg viewBox="0 0 100 100" className="absolute inset-0 size-full">
+          {/* Graduación menor: 36 ticks finos (cada 10°) */}
           <circle
             cx="50"
             cy="50"
             r="47.5"
             fill="none"
-            // 12 marcas: circunferencia ≈ 298.5 → dasharray 1 + 23.87 por tick
-            strokeDasharray="1 23.87"
+            // circunferencia ≈ 298.45 → 8.29 por período (298.45 / 36)
+            strokeDasharray="1 7.29"
             strokeLinecap="round"
-            strokeWidth="2.5"
-            stroke={isError ? '#e5484d' : 'rgba(246, 246, 246, 0.25)'}
+            strokeWidth="2"
+            stroke={isError ? 'rgba(229, 72, 77, 0.3)' : 'rgba(246, 246, 246, 0.14)'}
+          />
+          {/* Graduación mayor: 12 ticks de emisora (cada 30°) */}
+          <circle
+            cx="50"
+            cy="50"
+            r="47.5"
+            fill="none"
+            // circunferencia ≈ 298.45 → 24.87 por período (298.45 / 12)
+            strokeDasharray="2 22.87"
+            strokeLinecap="round"
+            strokeWidth="3"
+            stroke={isError ? '#e5484d' : 'rgba(246, 246, 246, 0.35)'}
+          />
+          {/* Marca dorada de OFF (medio paso antes de la emisora 1) */}
+          <rect
+            x="48.5"
+            y="2"
+            width="3"
+            height="8"
+            rx="1.5"
+            fill="#f6b40e"
+            transform="rotate(-15 50 50)"
           />
         </svg>
       </span>
 
-      {/* Aguja (muesca celeste): gira 180° por press, como selector */}
-      <span
-        aria-hidden="true"
-        className={`absolute inset-0 transition-transform ${DIAL_TIMING} motion-reduce:transition-none`}
-        style={{ transform: `rotate(${needleAngle}deg)` }}
-      >
+      {/* Aguja lectora: FIJA arriba — la escala gira por debajo */}
+      <span aria-hidden="true" className="absolute inset-0">
         <span
           className={[
             'absolute -top-[4px] left-1/2 size-2 -translate-x-1/2 rounded-full',
@@ -124,13 +154,13 @@ export default function PlayButton({ state, onToggle, disabled }) {
           aria-hidden="true"
         />
       ) : (
-        // Crossfade play↔pausa (⏸ permanece visible en modo radio)
+        // Crossfade ▶/⏸ según el estado real (▶ también al pausar)
         <span className="relative size-14 max-[480px]:size-11">
           <svg
             viewBox="0 0 24 24"
             aria-hidden="true"
             className={`absolute inset-0 transition-all duration-300 motion-reduce:transition-none ${
-              inRadioMode ? 'scale-50 rotate-12 opacity-0' : 'scale-100 rotate-0 opacity-100'
+              showPause ? 'scale-50 rotate-12 opacity-0' : 'scale-100 rotate-0 opacity-100'
             }`}
           >
             {GRADIENT_DEFS('icon-grad-play')}
@@ -140,7 +170,7 @@ export default function PlayButton({ state, onToggle, disabled }) {
             viewBox="0 0 24 24"
             aria-hidden="true"
             className={`absolute inset-0 transition-all duration-300 motion-reduce:transition-none ${
-              inRadioMode ? 'scale-100 rotate-0 opacity-100' : 'scale-50 -rotate-12 opacity-0'
+              showPause ? 'scale-100 rotate-0 opacity-100' : 'scale-50 -rotate-12 opacity-0'
             }`}
           >
             {GRADIENT_DEFS('icon-grad-pause')}

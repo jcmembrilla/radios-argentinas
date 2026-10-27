@@ -95,6 +95,10 @@ export default function Player({ radios }) {
     [radios, selectedUrl],
   );
 
+  // Índice de la emisora elegida en la lista (-1 si no hay): posiciona el
+  // dial del PlayButton (cada emisora tiene su lugar en la escala).
+  const stationIndex = radios.indexOf(selectedRadio);
+
   const handleToggle = useCallback(() => {
     toggle(selectedUrl);
   }, [toggle, selectedUrl]);
@@ -126,11 +130,14 @@ export default function Player({ radios }) {
 
   return (
     <div className="flex flex-col items-center gap-5">
-      {/* Botón play/pause: deshabilitado hasta elegir una radio */}
+      {/* Encendido + dial de sintonía: el dial refleja la emisora elegida;
+          deshabilitado hasta elegir una radio */}
       <PlayButton
         state={state}
         onToggle={handleToggle}
         disabled={!selectedUrl}
+        stationIndex={stationIndex}
+        stationCount={radios.length}
       />
 
       <VolumeSlider volume={volume} onChange={setVolume} />
