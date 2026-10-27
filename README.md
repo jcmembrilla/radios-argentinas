@@ -16,6 +16,7 @@ La aplicación está disponible en producción: **[radiosarg.netlify.app](https:
 
 - 🎙️ **Streaming en vivo** de las principales radios AM y FM de Argentina (AM 750, Rivadavia, La Red, Radio Mitre, Aspen y más).
 - ▶️ **Reproductor confiable**: máquina de estados basada en eventos reales del audio, con spinner de conexión y avisos de error si una radio cae.
+- 🎛️ **Perilla de radio**: el botón gira como un dial en cada cambio y mantiene el modo visible (⏸) mientras tengas una emisora elegida; cambiar de radio no pausa, salta directo a la nueva.
 - 📱 **PWA instalable**: agregala a la pantalla de inicio de tu celular y controlá la reproducción desde la pantalla de bloque (Media Session API).
 - 🌤️ **Almanaque**: fecha del día y clima actual (temperatura + condición) según tu ubicación, detectado automáticamente sin pedir permisos.
 - 🌙 **Dark mode único**: interfaz minimalista con glow celeste, sin imágenes de fondo.
